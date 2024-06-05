@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/code 3/BadDesignButFunctional/BadDesignButFunctional.iml" filepath="$PROJECT_DIR$/code 3/BadDesignButFunctional/BadDesignButFunctional.iml" />
+      <module fileurl="file://$PROJECT_DIR$/code 3/BasicMVC/BasicMVC.iml" filepath="$PROJECT_DIR$/code 3/BasicMVC/BasicMVC.iml" />
+      <module fileurl="file://$PROJECT_DIR$/code 3/GeneralCommandCallbacks/GeneralCommandCallbacks.iml" filepath="$PROJECT_DIR$/code 3/GeneralCommandCallbacks/GeneralCommandCallbacks.iml" />
+      <module fileurl="file://$PROJECT_DIR$/code 3/KeyboardEvents/KeyboardEvents.iml" filepath="$PROJECT_DIR$/code 3/KeyboardEvents/KeyboardEvents.iml" />
+      <module fileurl="file://$PROJECT_DIR$/code 3/KeyboardMaps/KeyboardMaps.iml" filepath="$PROJECT_DIR$/code 3/KeyboardMaps/KeyboardMaps.iml" />
+      <module fileurl="file://$PROJECT_DIR$/code 3/KeyboardMapsWithLambdaJava8/KeyboardMapsWithLambdaJava8.iml" filepath="$PROJECT_DIR$/code 3/KeyboardMapsWithLambdaJava8/KeyboardMapsWithLambdaJava8.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/MVC.iml" filepath="$PROJECT_DIR$/.idea/MVC.iml" />
+      <module fileurl="file://$PROJECT_DIR$/code/code.iml" filepath="$PROJECT_DIR$/code/code.iml" />
+      <module fileurl="file://$PROJECT_DIR$/code 2/code 2.iml" filepath="$PROJECT_DIR$/code 2/code 2.iml" />
+    </modules>
+  </component>
+</project>
