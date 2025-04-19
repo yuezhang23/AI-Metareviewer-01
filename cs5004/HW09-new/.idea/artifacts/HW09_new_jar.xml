@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="HW09-new:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/HW09_new_jar</output-path>
-    <root id="archive" name="HW09-new.jar">
-      <element id="module-output" name="HW09-new" />
-    </root>
-  </artifact>
-</component>

@@ -1,0 +1,60 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: iclr_reviews
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  ai_metareviewer:
+    build: 
+      context: .
+      dockerfile: AI-Metareviewer/Dockerfile
+    container_name: ai_metareviewer_container
+    depends_on:
+      - db
+    volumes:
+      - ./AI-Metareviewer/data:/app/data
+      - ./AI-Metareviewer:/app
+      - ./.env:/app/.env
+    command: >
+      sh -c "
+        # python setup/db_init.py &&
+        # python setup/metareviews.py &&
+        # python setup/reviews.py &&
+        python main.py &&
+        python failure_analysis.py
+      "
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: iclr_reviews
+      DB_USER: postgres
+      DB_PASSWORD: pass
+    ports:
+      - "8080:8080"  
+
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_container
+    depends_on:
+      - db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: jackiezy1002@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: jackiezy
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  postgres_data:
+  pgadmin_data:

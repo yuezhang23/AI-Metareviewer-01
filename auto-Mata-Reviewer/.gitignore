@@ -1,0 +1,6 @@
+.env
+__pycache__
+AI-Metareviewer/.env
+AI-Metareviewer/__pycache__
+AI-Metareviewer/data/
+AI-Metareviewer/large_inputs/ 
