@@ -111,5 +111,5 @@ with open("./data/failures.txt", "r") as f:
             plt.title('Confusion Matrix')
             plt.ylabel('True Label')
             plt.xlabel('Predicted Label')
-            plt.savefig('./data/confusion_matrix.png')
+            plt.savefig('./data/cm/confusion_matrix.png')
             plt.close()

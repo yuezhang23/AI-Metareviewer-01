@@ -96,18 +96,35 @@ with psycopg.connect(config["DB_CONFIG"], row_factory=dict_row) as conn:
                         f.write(id + "\n")
                 if (benchmarkResult == "REJECT"):
                     benchmarkRejectMatch += 1
-        
-print("Total Predicted Accepted: " + str(acceptMatch))
-print("Total Predicted Rejected: " + str(rejectMatch))
-print("Total Actual Accepted: " + str(totalAccept))
-print("Total Actual Rejected: " + str(totalReject))
 
-if (totalAccept > 0):
-    print("Success Rate on Accept: " + str(acceptMatch / totalAccept))
-    print("Benchmark Success Rate on Accept: " + str(benchmarkAcceptMatch / totalAccept))
-if (totalReject > 0):
-    print("Success Rate on Reject: " + str(rejectMatch / totalReject))
-    print("Benchmark Success Rate on Reject: " + str(benchmarkRejectMatch / totalReject))
+with open("./data/hypothesis.txt", "a") as h:  
+    h.write("\n")
+    print("Total Predicted Accepted: " + str(acceptMatch))
+    h.write("Total Predicted Accepted: " + str(acceptMatch) + "\n")      
 
-print("predicted F1 Score: " + str(getFScore(acceptMatch, totalReject - rejectMatch, totalAccept - acceptMatch)))
-print("benchmark F1 Score: " + str(getFScore(benchmarkAcceptMatch, totalReject - benchmarkRejectMatch, totalAccept - benchmarkAcceptMatch)))
+    print("Total Predicted Rejected: " + str(rejectMatch))
+    h.write("Total Predicted Rejected: " + str(rejectMatch) + "\n")      
+
+    print("Total Actual Accepted: " + str(totalAccept))
+    h.write("Total Actual Accepted: " + str(totalAccept) + "\n")      
+
+    print("Total Actual Rejected: " + str(totalReject))
+    h.write("Total Actual Rejected: " + str(totalReject) + "\n")      
+
+    if (totalAccept > 0):
+        print("Success Rate on Accept: " + str(acceptMatch / totalAccept))
+        h.write("Success Rate on Accept: " + str(acceptMatch / totalAccept)+ "\n")     
+
+        print("Benchmark Success Rate on Accept: " + str(benchmarkAcceptMatch / totalAccept))
+        h.write("Benchmark Success Rate on Accept: " + str(benchmarkAcceptMatch / totalAccept)+ "\n")      
+    if (totalReject > 0):
+        print("Success Rate on Reject: " + str(rejectMatch / totalReject))
+        h.write("Success Rate on Reject: " + str(rejectMatch / totalReject)+ "\n")     
+
+        print("Benchmark Success Rate on Reject: " + str(benchmarkRejectMatch / totalReject))
+        h.write("Benchmark Success Rate on Reject: " + str(benchmarkRejectMatch / totalReject)+ "\n")      
+
+    print("predicted F1 Score: " + str(getFScore(acceptMatch, totalReject - rejectMatch, totalAccept - acceptMatch)))
+    h.write("predicted F1 Score: " + str(getFScore(acceptMatch, totalReject - rejectMatch, totalAccept - acceptMatch))+"\n")
+    print("benchmark F1 Score: " + str(getFScore(benchmarkAcceptMatch, totalReject - benchmarkRejectMatch, totalAccept - benchmarkAcceptMatch)))
+    h.write("benchmark F1 Score: " + str(getFScore(benchmarkAcceptMatch, totalReject - benchmarkRejectMatch, totalAccept - benchmarkAcceptMatch))+"\n")
