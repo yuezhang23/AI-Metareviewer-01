@@ -13,26 +13,33 @@ def find_round_positions(lines):
     for i, line in enumerate(lines):
         if line.startswith('======== ROUND'):
             round_num = int(line.strip().split()[-1])
-            # Find the candidates line (starts with '(#Task')
+            # Find the candidates line and empty line before next round
+            candidates_line = None
+            empty_line = None
             for j in range(i + 1, len(lines)):
                 if lines[j].startswith("('# Task"):
-                    round_info.append({
-                        'round': round_num,
-                        'round_start': i,
-                        'candidates_line': j,
-                        'next_round': None
-                    })
+                    candidates_line = j
+                elif j < len(lines) - 1 and lines[j].strip() == '' and lines[j+1].startswith('======== ROUND'):
+                    empty_line = j
                     break
-    
-    # Set the next_round position for each round
-    for i in range(len(round_info) - 1):
-        round_info[i]['next_round'] = round_info[i + 1]['round_start']
+                elif j < len(lines) - 1 and lines[j+1].startswith('======== ROUND'):
+                    # No empty line found before next round
+                    break
+            
+            if candidates_line:
+                round_info.append({
+                    'round': round_num,
+                    'round_start': i,
+                    'candidates_line': candidates_line,
+                    'empty_line': empty_line
+                })
     
     return round_info
 
 # Read the file
 with open('results/meta_review.out', 'r') as f:
-    config = json.loads(f.readline())  # First line contains the config
+    config_line = f.readline()
+    config = json.loads(config_line)
     lines = f.readlines()
 
 # Get round information
@@ -43,12 +50,13 @@ task = tasks.MetareviewerBinaryTask('data/', config['max_threads'])
 gpt4 = predictors.BinaryPredictor(config)
 test_exs = task.get_test_examples()
 
-# Process each round
-new_lines = lines.copy()
-lines_inserted = 0  # Track number of lines inserted to adjust positions
-
+# Process each round and write results on the fly
 for round_data in round_info:
     print(f"Processing Round {round_data['round']}")
+    
+    # Skip if no empty line found before next round
+    if round_data['empty_line'] is None:
+        continue
     
     # Get candidates for this round
     candidates_line = lines[round_data['candidates_line']]
@@ -70,20 +78,13 @@ for round_data in round_info:
             print(f"Error evaluating candidate: {str(e)}")
             metrics.append(None)
     
-    # Find where to insert the metrics
-    if round_data['next_round'] is not None:
-        insert_position = round_data['next_round'] + lines_inserted
-    else:
-        insert_position = len(new_lines)  # Insert at the end if it's the last round
+    # Write the metrics to the empty line immediately
+    lines[round_data['empty_line']] = f"[{', '.join(map(str, metrics))}]\n"
     
-    # Insert the metrics line
-    new_lines.insert(insert_position, f"[{', '.join(map(str, metrics))}]\n")
-    lines_inserted += 1
+    # Write the current state back to file
+    with open('results/meta_review.out', 'w') as f:
+        f.writelines([config_line] + lines)
     
     print(f"Inserted metrics for Round {round_data['round']}: {metrics}")
-
-# Write the updated content back to the file
-with open('results/meta_review.out', 'w') as f:
-    f.writelines([config_line] + new_lines)
 
 print("Evaluation completed!")

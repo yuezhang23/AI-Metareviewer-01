@@ -31,7 +31,7 @@ services:
         # python main.py &&
         # python failure_analysis.py
         # python testing.py &&
-        python main.py --task metareviewer --prompts prompts/metareview.md --data_dir data/ --out results/meta_review.out --evaluator ucb &&
+        # python main.py --task metareviewer --prompts prompts/metareview.md --data_dir data/ --out results/meta_review.out --evaluator ucb &&
         python inference_eval.py
       "
     env_file:
