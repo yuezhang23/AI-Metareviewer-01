@@ -137,13 +137,13 @@ class MetareviewerBinaryTask(BinaryClassificationTask):
     categories = ['No', 'Yes']
 
     def get_train_examples(self):
-        df = pd.read_csv(self.data_dir + '/metareviewer_data_balanced.csv', sep=';', header=None)
+        df = pd.read_csv(self.data_dir + 'metareviewer_balanced_data.csv', sep=';')
         exs = df.reset_index().to_dict('records')
-        exs = [{'id': x[0], 'text': x[1], 'label': int(x[2])} for x in exs]
+        exs = [{'id': x['id'], 'text': x['text'], 'label': int(x['label'])} for x in exs]
         return exs
     
     def get_test_examples(self):
-        df = pd.read_csv(self.data_dir + '/metareviewer_data_balanced.csv', sep=';', header=None)
+        df = pd.read_csv(self.data_dir + 'metareviewer_test_data.csv', sep=';')
         exs = df.reset_index().to_dict('records')
-        exs = [{'id': x[0], 'text': x[1], 'label': int(x[2])} for x in exs]
+        exs = [{'id': x['id'], 'text': x['text'], 'label': int(x['label'])} for x in exs]
         return exs

@@ -2,6 +2,9 @@ import pandas as pd
 import psycopg
 import csv
 from psycopg.rows import dict_row
+from dotenv import dotenv_values
+
+config = dotenv_values(".env")
 
 ratingScores = {
     1: "Very Strong Reject: For instance, a paper with incorrect statements, improper (e.g., offensive) language, unaddressed ethical considerations, incorrect results and/or flawed methodology (e.g., training using a test set).",
@@ -50,12 +53,12 @@ def toString(review):
     return ret
 
 
-def get_train_examples():
+
+def get_train_examples(qry):
     exs = []
-    with psycopg.connect("dbname=iclr_reviews user=postgres password=password host=localhost port=5432", row_factory=dict_row) as conn:
+    with psycopg.connect(config["DB_CONFIG"], row_factory=dict_row) as conn:
         with conn.cursor() as cur:
-            cur.execute("""SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%reject%' UNION ALL 
-                        (SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%accept%' LIMIT 200)""")
+            cur.execute(qry)
             allMetareviews = cur.fetchall()
             for metareview in allMetareviews:
                 id = metareview["id"]
@@ -70,10 +73,28 @@ def get_train_examples():
 
                 exs.append({'id': id, 'text': promptText, 'label': 1 if "accept" in decision.lower() else 0})
     header = ['id', 'text', 'label']
-    with open('metareviewer_data.csv', 'w', newline='', encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=header, delimiter=";")
-        writer.writeheader()  # Write the header row
-        writer.writerows(exs) # Write multiple data rows
+    return header, exs
+
+QUERY1 = """(SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%accept%' LIMIT 50) UNION ALL 
+(SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%reject%' LIMIT 50);"""
+
+QUERY2 = """(SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%accept%' OFFSET 50 LIMIT 25)
+UNION ALL (SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%reject%' OFFSET 50 LIMIT 25);
+"""
+
+
+with open('./data/metareviewer_balanced_data.csv', 'w', newline='', encoding="utf-8") as file:
+    header, exs = get_train_examples(QUERY1)
+    writer = csv.DictWriter(file, fieldnames=header, delimiter=";")
+    writer.writeheader()  # Write the header row
+    writer.writerows(exs) # Write multiple data rows
+
+with open('./data/metareviewer_test_data.csv', 'w', newline='', encoding="utf-8") as file:
+    header, exs = get_train_examples(QUERY2)
+    writer = csv.DictWriter(file, fieldnames=header, delimiter=";")
+    writer.writeheader()  # Write the header row
+    writer.writerows(exs) # Write multiple data rows
+
 
 # def get_train_examples():
 #     df = pd.read_csv('./metareviewer_data_test.csv', sep=';', header=None)
@@ -82,4 +103,4 @@ def get_train_examples():
 #     print(exs)
 #     return exs
 
-get_train_examples()
+# get_train_examples()

@@ -8,7 +8,7 @@ import requests
 from dotenv import dotenv_values
 import string
 
-config = dotenv_values("../.env")
+config = dotenv_values(".env")
 
 def parse_sectioned_prompt(s):
 
@@ -30,7 +30,7 @@ def parse_sectioned_prompt(s):
 
 
 def chatgpt(prompt, temperature=0.7, n=1, top_p=1, stop=None, max_tokens=1024, 
-                  presence_penalty=0, frequency_penalty=0, logit_bias={}, timeout=10):
+                  presence_penalty=0, frequency_penalty=0, logit_bias={}, timeout=30):
     messages = [{"role": "user", "content": prompt}]
     payload = {
         "messages": messages,
@@ -49,7 +49,7 @@ def chatgpt(prompt, temperature=0.7, n=1, top_p=1, stop=None, max_tokens=1024,
         try:
             r = requests.post('https://api.openai.com/v1/chat/completions',
                 headers = {
-                    "Authorization": f"Bearer {config["OPENAI_API_KEY"]}",
+                    "Authorization": f"Bearer {config['OPENAI_API_KEY']}",
                     "Content-Type": "application/json"
                 },
                 json = payload,
@@ -80,7 +80,7 @@ def instructGPT_logprobs(prompt, temperature=0.7):
         try:
             r = requests.post('https://api.openai.com/v1/completions',
                 headers = {
-                    "Authorization": f"Bearer {config["OPENAI_API_KEY"]}",
+                    "Authorization": f"Bearer {config['OPENAI_API_KEY']}",
                     "Content-Type": "application/json"
                 },
                 json = payload,

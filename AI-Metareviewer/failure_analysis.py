@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
+from datetime import datetime
 
 
 config = dotenv_values(".env")
@@ -108,7 +109,7 @@ with open("./data/failures.txt", "r") as f:
             sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
                         xticklabels=['Predicted Accept', 'Predicted Reject'],
                         yticklabels=['Actual Accept', 'Actual Reject'])
-            plt.title('Confusion Matrix')
+            plt.title('cm' + len(actualAcceptanceArr) + "/" + len(actualRejectionArr)+ datetime.now().strftime('%Y%m%d_%H%M%S'))
             plt.ylabel('True Label')
             plt.xlabel('Predicted Label')
             plt.savefig('./data/cm/confusion_matrix.png')

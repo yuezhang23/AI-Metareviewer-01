@@ -19,3 +19,4 @@ deepseek
 matplotlib
 seaborn
 tiktoken
+python-liquid

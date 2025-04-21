@@ -19,16 +19,20 @@ services:
     depends_on:
       - db
     volumes:
-      - ./AI-Metareviewer/data:/app/data
-      - ./AI-Metareviewer:/app
+      - ./AI-Metareviewer/prompt_optimization/data:/app/data
+      - ./AI-Metareviewer/prompt_optimization:/app
+      - ./AI-Metareviewer/setup:/app/setup
       - ./.env:/app/.env
     command: >
       sh -c "
         # python setup/db_init.py &&
         # python setup/metareviews.py &&
         # python setup/reviews.py &&
-        python main.py &&
-        python failure_analysis.py
+        # python main.py &&
+        # python failure_analysis.py
+        # python testing.py &&
+        python main.py --task metareviewer --prompts prompts/metareview.md --data_dir data/ --out results/meta_review.out --evaluator ucb &&
+        python inference_eval.py
       "
     env_file:
       - .env

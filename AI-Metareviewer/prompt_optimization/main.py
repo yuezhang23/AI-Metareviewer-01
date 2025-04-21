@@ -61,15 +61,20 @@ def get_args():
     parser.add_argument('--temperature', default=0.0, type=float)
 
     parser.add_argument('--optimizer', default='nl-gradient')
-    parser.add_argument('--rounds', default=6, type=int)
-    parser.add_argument('--beam_size', default=4, type=int)
-    parser.add_argument('--n_test_exs', default=400, type=int)
+    parser.add_argument('--rounds', default=4, type=int)
+    parser.add_argument('--beam_size', default=3, type=int)
+    parser.add_argument('--n_test_exs', default=50, type=int) #400
 
-    parser.add_argument('--minibatch_size', default=64, type=int)
+    parser.add_argument('--minibatch_size', default=32, type=int)
+    # # gradients per prompt
     parser.add_argument('--n_gradients', default=4, type=int)
+    # generate gradients 4 error strings -> 1 long error string
     parser.add_argument('--errors_per_gradient', default=4, type=int)
+    #  1 error string -> 1 gradient
     parser.add_argument('--gradients_per_error', default=1, type=int)
+    # 1 gradient -> 1 new prompt
     parser.add_argument('--steps_per_gradient', default=1, type=int)
+    # mc expansion  = 4 + 1
     parser.add_argument('--mc_samples_per_step', default=2, type=int)
     parser.add_argument('--max_expansion_factor', default=8, type=int)
 
@@ -77,10 +82,10 @@ def get_args():
 
     parser.add_argument('--evaluator', default="bf", type=str)
     parser.add_argument('--scorer', default="01", type=str)
-    parser.add_argument('--eval_rounds', default=8, type=int)
-    parser.add_argument('--eval_prompts_per_round', default=8, type=int)
+    parser.add_argument('--eval_rounds', default=2, type=int)
+    parser.add_argument('--eval_prompts_per_round', default=4, type=int)
     # calculated by s-sr and sr
-    parser.add_argument('--samples_per_eval', default=32, type=int)
+    parser.add_argument('--samples_per_eval', default=4, type=int)
     parser.add_argument('--c', default=1.0, type=float, help='exploration param for UCB. higher = more exploration')
     parser.add_argument('--knn_k', default=2, type=int)
     parser.add_argument('--knn_t', default=0.993, type=float)
@@ -94,7 +99,7 @@ def get_args():
 if __name__ == '__main__':
     args = get_args()
 
-    config = vars(args)
+    config = vars(args) 
 
     config['eval_budget'] = config['samples_per_eval'] * config['eval_rounds'] * config['eval_prompts_per_round']
     
@@ -128,7 +133,8 @@ if __name__ == '__main__':
         if round > 0:
             candidates = optimizer.expand_candidates(candidates, task, gpt4, train_exs)
 
-        # score candidates
+        print(f"candidate counts : {len(candidates)}")
+        # score candidates UCB
         scores = optimizer.score_candidates(candidates, task, gpt4, train_exs)
         [scores, candidates] = list(zip(*sorted(list(zip(scores, candidates)), reverse=True)))
 
@@ -142,11 +148,14 @@ if __name__ == '__main__':
             outf.write(f'{time.time() - start}\n')
             outf.write(f'{candidates}\n')
             outf.write(f'{scores}\n')
-        metrics = []
-        for candidate, score in zip(candidates, scores):
-            f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs, n=args.n_test_exs)
-            metrics.append(f1)
-        with open(args.out, 'a') as outf:  
-            outf.write(f'{metrics}\n')
 
-    print("DONE!")
+        print(f"b-arm candidate counts : {len(candidates)}")
+
+        # metrics = []
+        # for candidate, score in zip(candidates, scores):
+        #     f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs, n=args.n_test_exs)
+        #     metrics.append(f1)
+        # with open(args.out, 'a') as outf:  
+        #     outf.write(f'{metrics}\n')
+
+    print("DONE on train set!")
