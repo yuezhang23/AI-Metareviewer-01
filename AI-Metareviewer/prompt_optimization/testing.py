@@ -75,11 +75,11 @@ def get_train_examples(qry):
     header = ['id', 'text', 'label']
     return header, exs
 
-QUERY1 = """(SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%accept%' LIMIT 50) UNION ALL 
-(SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%reject%' LIMIT 50);"""
+QUERY1 = """(SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%accept%' LIMIT 100) UNION ALL 
+(SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%reject%' LIMIT 100);"""
 
-QUERY2 = """(SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%accept%' OFFSET 50 LIMIT 25)
-UNION ALL (SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%reject%' OFFSET 50 LIMIT 25);
+QUERY2 = """(SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%accept%' OFFSET 100 LIMIT 200)
+UNION ALL (SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%reject%' OFFSET 100 LIMIT 200);
 """
 
 

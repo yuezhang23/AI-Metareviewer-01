@@ -57,14 +57,15 @@ def get_args():
     parser.add_argument('--prompts', default='prompts/ethos.md')
     # parser.add_argument('--config', default='default.json')
     parser.add_argument('--out', default='test_out.txt')
-    parser.add_argument('--max_threads', default=5, type=int)
+    parser.add_argument('--max_threads', default=6, type=int)
     parser.add_argument('--temperature', default=0.0, type=float)
     parser.add_argument('--optimizer', default='nl-gradient')
 
+    # rounds
     parser.add_argument('--rounds', default=4, type=int)
-    parser.add_argument('--beam_size', default=3, type=int)
-    parser.add_argument('--n_test_exs', default=50, type=int) #400
-    parser.add_argument('--minibatch_size', default=32, type=int)
+    parser.add_argument('--beam_size', default=4, type=int)
+    parser.add_argument('--n_test_exs', default=400, type=int) #400
+    parser.add_argument('--minibatch_size', default=64, type=int)
 
     # expansion parameters
     parser.add_argument('--n_gradients', default=4, type=int)   
@@ -79,6 +80,7 @@ def get_args():
     parser.add_argument('--scorer', default="01", type=str)
 
     # selection parameters
+    # optimization steps
     parser.add_argument('--eval_rounds', default=2, type=int)
     parser.add_argument('--eval_prompts_per_round', default=4, type=int)
     parser.add_argument('--samples_per_eval', default=4, type=int)
@@ -145,7 +147,7 @@ if __name__ == '__main__':
             outf.write(f'{time.time() - start}\n')
             outf.write(f'{candidates}\n')
             outf.write(f'{scores}\n')
-            outf.write('f1')
+            outf.write('f1\n')
 
         print(f"b-arm candidate counts : {len(candidates)}")
 

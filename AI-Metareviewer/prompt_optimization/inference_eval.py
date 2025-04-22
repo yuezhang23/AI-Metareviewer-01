@@ -13,17 +13,13 @@ def find_round_positions(lines):
     for i, line in enumerate(lines):
         if line.startswith('======== ROUND'):
             round_num = int(line.strip().split()[-1])
-            # Find the candidates line and f1 line
-            candidates_line = None
-            f1_line = None
-            for j in range(i + 1, len(lines)):
-                if lines[j].startswith("('# Task"):
-                    candidates_line = j
-                elif lines[j].startswith('f1'):
-                    f1_line = j
-                elif j < len(lines) - 1 and lines[j+1].startswith('======== ROUND'):
-                    break
-            
+
+            candidates_line = i + 2
+            if lines[i + 4].startswith('f1'):
+                f1_line = i + 4
+            else:
+                f1_line = None
+
             if candidates_line and f1_line:
                 round_info.append({
                     'round': round_num,
@@ -36,7 +32,7 @@ def find_round_positions(lines):
 
 # Read the file
 with open('results/meta_review.out', 'r') as f:
-    config_line = f.readline()  # Store the config line
+    config_line = f.readline()  
     config = json.loads(config_line)
     lines = f.readlines()
 
@@ -44,7 +40,7 @@ with open('results/meta_review.out', 'r') as f:
 round_info = find_round_positions(lines)
 
 # Initialize components
-task = tasks.MetareviewerBinaryTask('data/', config['max_threads'])
+task = tasks.MetareviewerBinaryTask('data/', 20)
 gpt4 = predictors.BinaryPredictor(config)
 test_exs = task.get_test_examples()
 
@@ -54,34 +50,40 @@ new_lines = lines.copy()
 for round_data in round_info:
     print(f"Processing Round {round_data['round']}")
     
-    # Get candidates for this round
-    candidates_line = lines[round_data['candidates_line']]
-    candidates = ast.literal_eval(candidates_line.strip())
-    
-    # Evaluate candidates
-    metrics = []
-    for candidate in tqdm(candidates, desc=f"Evaluating candidates for Round {round_data['round']}"):
-        try:
-            f1, texts, labels, preds = task.evaluate(
-                gpt4, 
-                candidate, 
-                test_exs, 
-                n=config['n_test_exs']
-            )
-            metrics.append(f1)
-            print(f"Candidate evaluated with F1: {f1}")
-        except Exception as e:
-            print(f"Error evaluating candidate: {str(e)}")
-            metrics.append(None)
-    
-    # Replace the f1 line with computed metrics
-    f1_line_position = round_data['f1_line']
-    new_lines[f1_line_position] = f"[{', '.join(map(str, metrics))}]\n"
-    
-    print(f"Replaced f1 line for Round {round_data['round']} with metrics: {metrics}")
-
-# Write the updated content back to the file
-with open('results/meta_review.out', 'w') as f:
-    f.writelines([config_line] + new_lines)
+    try:
+        # Get candidates for this round
+        candidates_line = lines[round_data['candidates_line']]
+        candidates = ast.literal_eval(candidates_line.strip())
+        
+        # Evaluate candidates
+        metrics = []
+        for candidate in tqdm(candidates, desc=f"Evaluating candidates for Round {round_data['round']}"):
+            try:
+                f1, texts, labels, preds = task.evaluate(
+                    gpt4, 
+                    candidate, 
+                    test_exs, 
+                    n=config['n_test_exs']
+                )
+                metrics.append(f1)
+                print(f"Candidate evaluated with F1: {f1}")
+            except Exception as e:
+                print(f"Error evaluating candidate: {str(e)}")
+                metrics.append(None)
+        
+        # Replace the f1 line with computed metrics
+        f1_line_position = round_data['f1_line']
+        new_lines[f1_line_position] = f"[{', '.join(map(str, metrics))}]\n"
+        
+        
+        # Write the updated content back to the file after each round
+        with open('results/meta_review.out', 'w') as f:
+            f.writelines([config_line] + new_lines)
+        
+        print(f"Saved results for Round {round_data['round']}")
+        
+    except Exception as e:
+        print(f"Error processing Round {round_data['round']}: {str(e)}")
+        continue
 
 print("Evaluation completed!")
