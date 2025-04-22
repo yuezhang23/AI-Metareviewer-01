@@ -145,7 +145,7 @@ if __name__ == '__main__':
             outf.write(f'{time.time() - start}\n')
             outf.write(f'{candidates}\n')
             outf.write(f'{scores}\n')
-            outf.write("\n")
+            outf.write('f1')
 
         print(f"b-arm candidate counts : {len(candidates)}")
 
