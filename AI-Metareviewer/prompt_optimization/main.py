@@ -57,7 +57,7 @@ def get_args():
     parser.add_argument('--prompts', default='prompts/ethos.md')
     # parser.add_argument('--config', default='default.json')
     parser.add_argument('--out', default='test_out.txt')
-    parser.add_argument('--max_threads', default=6, type=int)
+    parser.add_argument('--max_threads', default=8, type=int)
     parser.add_argument('--temperature', default=0.0, type=float)
     parser.add_argument('--optimizer', default='nl-gradient')
 
