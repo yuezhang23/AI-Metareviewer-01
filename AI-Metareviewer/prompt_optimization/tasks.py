@@ -1,14 +1,13 @@
 import requests
 import json
 import concurrent.futures
+import os
 from abc import ABC, abstractmethod
 from typing import List, Dict, Callable
 from tqdm import tqdm
 import pandas as pd
 from sklearn.metrics import accuracy_score, f1_score, classification_report
 from custom_utils import toString
-import psycopg
-from psycopg.rows import dict_row
 
 class DataProcessor(ABC):
     def __init__(self, data_dir, max_threads=1):
@@ -45,13 +44,53 @@ class ClassificationTask(DataProcessor):
         labels = []
         preds = []
         texts = []
-        with concurrent.futures.ProcessPoolExecutor(max_workers=self.max_threads) as executor:
-            futures = [executor.submit(process_example, ex, predictor, prompt) for ex in test_exs[:n]]
-            for i, future in tqdm(enumerate(concurrent.futures.as_completed(futures)), total=len(futures), desc='running evaluate'):
-                ex, pred = future.result()
-                texts.append(ex['text'])
-                labels.append(ex['label'])
-                preds.append(pred)
+        
+        # Create checkpoint directory if it doesn't exist
+        checkpoint_dir = os.path.join(self.data_dir, 'checkpoints')
+        os.makedirs(checkpoint_dir, exist_ok=True)
+        checkpoint_file = os.path.join(checkpoint_dir, 'evaluation_progress.json')
+        
+        # Load previous progress if exists
+        if os.path.exists(checkpoint_file):
+            with open(checkpoint_file, 'r') as f:
+                progress = json.load(f)
+                start_idx = progress['last_processed_idx'] + 1
+                labels = progress['labels']
+                preds = progress['preds']
+        else:
+            start_idx = 0
+        
+        batch_size = 50
+        for batch_start in range(start_idx, min(n, len(test_exs)), batch_size):
+            batch_end = min(batch_start + batch_size, n)
+            batch_exs = test_exs[batch_start:batch_end]
+            
+            try:
+                with concurrent.futures.ProcessPoolExecutor(max_workers=self.max_threads) as executor:
+                    futures = [executor.submit(process_example, ex, predictor, prompt) for ex in batch_exs]
+                    for future in tqdm(concurrent.futures.as_completed(futures), 
+                                     total=len(futures), 
+                                     desc=f'Processing batch {batch_start//batch_size + 1}'):
+                        ex, pred = future.result()
+                        texts.append(ex['text'])
+                        labels.append(ex['label'])
+                        preds.append(pred)
+                
+                # Save progress after each successful batch (only labels and preds)
+                progress = {
+                    'last_processed_idx': batch_end - 1,
+                    'labels': labels,
+                    'preds': preds
+                }
+                with open(checkpoint_file, 'w') as f:
+                    json.dump(progress, f)
+                    
+            except (concurrent.futures.process.BrokenProcessPool, requests.exceptions.SSLError) as e:
+                print(f"Error processing batch {batch_start//batch_size + 1}: {str(e)}")
+                # Remove checkpoint file to indicate incomplete processing
+                if os.path.exists(checkpoint_file):
+                    os.remove(checkpoint_file)
+                raise e
 
         accuracy = accuracy_score(labels, preds)
         f1 = f1_score(labels, preds, average='micro')
@@ -137,13 +176,15 @@ class MetareviewerBinaryTask(BinaryClassificationTask):
     categories = ['No', 'Yes']
 
     def get_train_examples(self):
-        df = pd.read_csv(self.data_dir + 'metareviewer_balanced_data.csv', sep=';')
+        df = pd.read_csv(self.data_dir + 'metareviewer_data_train_200.csv', sep=';')
+        # df = pd.read_csv(self.data_dir + '00metareviewer_data_balanced.csv', sep=';')
         exs = df.reset_index().to_dict('records')
         exs = [{'id': x['id'], 'text': x['text'], 'label': int(x['label'])} for x in exs]
         return exs
     
     def get_test_examples(self):
-        df = pd.read_csv(self.data_dir + 'metareviewer_test_data.csv', sep=';')
+        df = pd.read_csv(self.data_dir + 'metareviewer_data_test_200.csv', sep=';')
+        # df = pd.read_csv(self.data_dir + '00metareviewer_data_balanced.csv', sep=';')
         exs = df.reset_index().to_dict('records')
         exs = [{'id': x['id'], 'text': x['text'], 'label': int(x['label'])} for x in exs]
         return exs

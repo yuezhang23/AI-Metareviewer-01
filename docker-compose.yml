@@ -27,12 +27,12 @@ services:
       sh -c "
         # python setup/db_init.py &&
         # python setup/metareviews.py &&
-        # python setup/reviews.py &&
+        # python setup/reviews.py
         # python main.py &&
         # python failure_analysis.py
-        # python testing.py &&
-        python main.py --task metareviewer --prompts prompts/metareview.md --data_dir data/ --out results/meta_review.out --evaluator ucb &&
-        python inference_eval.py
+        # python testing.py 
+        python main.py --data_dir data/ --out results/meta_review_00.out --evaluator ucb 
+        # python test_eval.py --file_name results/meta_review_00.out --max_threads 16
       "
     env_file:
       - .env
@@ -44,7 +44,6 @@ services:
       DB_PASSWORD: pass
     ports:
       - "8080:8080"  
-
 
   pgadmin:
     image: dpage/pgadmin4:latest

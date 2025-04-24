@@ -11,7 +11,6 @@ import tasks
 import predictors
 import optimizers
 
-
 def get_task_class(task_name):
     if task_name == 'ethos':
         return tasks.EthosBinaryTask
@@ -52,19 +51,20 @@ def get_scorer(scorer):
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--task', default='ethos')
-    parser.add_argument('--data_dir', default='data/ethos')
-    parser.add_argument('--prompts', default='prompts/ethos.md')
+    parser.add_argument('--task', default='metareviewer')
+    parser.add_argument('--data_dir', default='data/')
+    parser.add_argument('--prompts', default='prompts/metareview.md')
     # parser.add_argument('--config', default='default.json')
     parser.add_argument('--out', default='test_out.txt')
-    parser.add_argument('--max_threads', default=8, type=int)
+    parser.add_argument('--max_threads', default=6, type=int)
     parser.add_argument('--temperature', default=0.0, type=float)
+    parser.add_argument('--expansion_temperature', default=0.6, type=float)
     parser.add_argument('--optimizer', default='nl-gradient')
 
     # rounds
-    parser.add_argument('--rounds', default=4, type=int)
+    parser.add_argument('--rounds', default=3, type=int)
     parser.add_argument('--beam_size', default=4, type=int)
-    parser.add_argument('--n_test_exs', default=400, type=int) #400
+    parser.add_argument('--n_test_exs', default=200, type=int) 
     parser.add_argument('--minibatch_size', default=64, type=int)
 
     # expansion parameters
@@ -81,10 +81,10 @@ def get_args():
 
     # selection parameters
     # optimization steps
-    parser.add_argument('--eval_rounds', default=2, type=int)
+    parser.add_argument('--eval_rounds', default=4, type=int)
     parser.add_argument('--eval_prompts_per_round', default=4, type=int)
     parser.add_argument('--samples_per_eval', default=4, type=int)
-    parser.add_argument('--c', default=1.0, type=float, help='exploration param for UCB. higher = more exploration')
+    parser.add_argument('--c', default=1.5, type=float, help='exploration param for UCB. higher = more exploration')
 
     parser.add_argument('--knn_k', default=2, type=int)
     parser.add_argument('--knn_t', default=0.993, type=float)
@@ -128,12 +128,11 @@ if __name__ == '__main__':
         print("STARTING ROUND ", round)
         start = time.time()
 
-        # expand candidates
         if round > 0:
             candidates = optimizer.expand_candidates(candidates, task, gpt4, train_exs)
 
         print(f"candidate counts : {len(candidates)}")
-        # score candidates UCB
+
         scores = optimizer.score_candidates(candidates, task, gpt4, train_exs)
         [scores, candidates] = list(zip(*sorted(list(zip(scores, candidates)), reverse=True)))
 
@@ -147,15 +146,14 @@ if __name__ == '__main__':
             outf.write(f'{time.time() - start}\n')
             outf.write(f'{candidates}\n')
             outf.write(f'{scores}\n')
-            outf.write('f1\n')
+            # outf.write('f1\n')
 
-        print(f"b-arm candidate counts : {len(candidates)}")
 
-        # metrics = []
-        # for candidate, score in zip(candidates, scores):
-        #     f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs, n=args.n_test_exs)
-        #     metrics.append(f1)
-        # with open(args.out, 'a') as outf:  
-        #     outf.write(f'{metrics}\n')
+        metrics = []
+        for candidate, score in zip(candidates, scores):
+            f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs, n=args.n_test_exs)
+            metrics.append(f1)
+        with open(args.out, 'a') as outf:  
+            outf.write(f'{metrics}\n')
 
     print("DONE on train set!")

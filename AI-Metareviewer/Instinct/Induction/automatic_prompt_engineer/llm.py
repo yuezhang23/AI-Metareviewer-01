@@ -411,36 +411,41 @@ class GPT_Forward(LLM):
     def __async_generate(self, prompt, n):
         ml = [[{"role": "user", "content": p.replace('[APE]', '').strip()}] for p in prompt]
         answer = None
-        # print(self.config)
         if "text" in self.config['gpt_config']['model']:
             raise ValueError
         else:
             model = self.config['gpt_config']['model']
         print(model)
-        while answer is None:
+        
+        # Implement exponential backoff
+        max_retries = 3
+        base_delay = 1
+        
+        for attempt in range(max_retries):
             try:
                 predictions = asyncio.run(asyncio.wait_for(dispatch_openai_requests(
-                    messages_list = ml,
+                    messages_list=ml,
                     model=model,
                     temperature=0,
                     max_tokens=256,
                     frequency_penalty=0,
                     presence_penalty=0
-                    ), timeout=25)
-                )
-            except asyncio.TimeoutError:
-                print("The task exceeded the time limit 25 s.")
-            except Exception as e:
-                # if 'is greater than the maximum' in str(e):
-                #     raise BatchSizeException()
-                print(e)
-                print("Retrying....")
-                time.sleep(20)
-
-            try:
+                ), timeout=25))
+                
                 answer = [x['choices'][0]['message']['content'] for x in predictions]
-            except Exception:
-                print("Please Wait!")
+                break
+                
+            except asyncio.TimeoutError:
+                print(f"Timeout on attempt {attempt + 1}. Retrying...")
+                time.sleep(base_delay * (2 ** attempt))
+            except Exception as e:
+                print(f"Error on attempt {attempt + 1}: {str(e)}")
+                if attempt < max_retries - 1:
+                    time.sleep(base_delay * (2 ** attempt))
+                else:
+                    print("Max retries reached. Returning empty responses.")
+                    answer = ['No response from API'] * len(ml)
+                    break
 
         return answer
         # try:          

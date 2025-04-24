@@ -70,7 +70,7 @@ class ProTeGi(PromptOptimizer):
         Wrap each reason with <START> and <END>
         """
         gradient_prompt = '\n'.join([line.lstrip() for line in gradient_prompt.split('\n')])
-        res = utils.chatgpt(gradient_prompt, n=n)
+        res = utils.chatgpt(gradient_prompt, self.opt['expansion_temperature'], n=n)
         feedbacks = []
         new_prompts = []
         for r in res:    
@@ -96,7 +96,7 @@ class ProTeGi(PromptOptimizer):
         The {steps_per_gradient} new prompts are:
         """
         transformation_prompt = '\n'.join([line.lstrip() for line in transformation_prompt.split('\n')])
-        res = utils.chatgpt(transformation_prompt, n=n)
+        res = utils.chatgpt(transformation_prompt, self.opt['expansion_temperature'], n=n)
         new_prompts = []
         for r in res:   
             new_prompts += self.parse_tagged_text(r, "<START>", "<END>")
@@ -105,7 +105,7 @@ class ProTeGi(PromptOptimizer):
     def generate_synonyms(self, prompt_section, n=3):
         """ Generate synonyms for a prompt section."""
         rewriter_prompt = f"Generate a variation of the following instruction while keeping the semantic meaning.\n\nInput: {prompt_section}\n\nOutput:"
-        new_instructions = utils.chatgpt(rewriter_prompt, n=n)
+        new_instructions = utils.chatgpt(rewriter_prompt, self.opt['expansion_temperature'], n=n)
         new_instructions = [x for x in new_instructions if x]
         return new_instructions
 
