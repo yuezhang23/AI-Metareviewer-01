@@ -30,10 +30,15 @@ def parse_sectioned_prompt(s):
 
 
 def chatgpt(prompt, temperature, n=1, top_p=1, stop=None, max_tokens=1024, 
-                  presence_penalty=0, frequency_penalty=0, logit_bias={}, timeout=10):
-    messages = [{"role": "user", "content": prompt}]
+                  presence_penalty=0, frequency_penalty=0, logit_bias={}, timeout=30):
+    # Handle both single prompt and batch of prompts
+    if isinstance(prompt, str):
+        messages_list = [[{"role": "user", "content": prompt}]]
+    else:
+        messages_list = [[{"role": "user", "content": p}] for p in prompt]
+    
     payload = {
-        "messages": messages,
+        "messages": messages_list[0],  # For backward compatibility
         "model": "gpt-4o-mini",
         "temperature": temperature,
         "n": n,
@@ -44,27 +49,48 @@ def chatgpt(prompt, temperature, n=1, top_p=1, stop=None, max_tokens=1024,
         "frequency_penalty": frequency_penalty,
         "logit_bias": logit_bias
     }
+    
     retries = 0
     while True:
         try:
-            r = requests.post('https://api.openai.com/v1/chat/completions',
-                headers = {
-                    "Authorization": f"Bearer {config['OPENAI_API_KEY']}",
-                    "Content-Type": "application/json"
-                },
-                json = payload,
-                timeout=timeout
-            )
-            if r.status_code != 200:
-                retries += 1
-                time.sleep(1)
+            if len(messages_list) > 1:
+                responses = []
+                for messages in messages_list:
+                    payload["messages"] = messages
+                    r = requests.post('https://api.openai.com/v1/chat/completions',
+                        headers = {
+                            "Authorization": f"Bearer {config['OPENAI_API_KEY']}",
+                            "Content-Type": "application/json"
+                        },
+                        json = payload,
+                        timeout=timeout
+                    )
+                    if r.status_code == 200:
+                        responses.append(r.json())
+                    else:
+                        retries += 1
+                        time.sleep(1)
+                if responses:
+                    return [choice['message']['content'] for response in responses for choice in response['choices']]
             else:
-                break
+                # Single prompt processing
+                r = requests.post('https://api.openai.com/v1/chat/completions',
+                    headers = {
+                        "Authorization": f"Bearer {config['OPENAI_API_KEY']}",
+                        "Content-Type": "application/json"
+                    },
+                    json = payload,
+                    timeout=timeout
+                )
+                if r.status_code == 200:
+                    r = r.json()
+                    return [choice['message']['content'] for choice in r['choices']]
+                else:
+                    retries += 1
+                    time.sleep(1)
         except requests.exceptions.ReadTimeout:
             time.sleep(1)
             retries += 1
-    r = r.json()
-    return [choice['message']['content'] for choice in r['choices']]
 
 
 def instructGPT_logprobs(prompt, temperature=0.7):
@@ -84,7 +110,7 @@ def instructGPT_logprobs(prompt, temperature=0.7):
                     "Content-Type": "application/json"
                 },
                 json = payload,
-                timeout=10
+                timeout=30
             )  
             if r.status_code != 200:
                 time.sleep(2)

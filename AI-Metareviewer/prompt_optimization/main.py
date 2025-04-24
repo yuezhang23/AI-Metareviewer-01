@@ -10,6 +10,7 @@ import scorers
 import tasks
 import predictors
 import optimizers
+from sklearn.metrics import f1_score
 
 def get_task_class(task_name):
     if task_name == 'ethos':
@@ -81,9 +82,9 @@ def get_args():
 
     # selection parameters
     # optimization steps
-    parser.add_argument('--eval_rounds', default=4, type=int)
+    parser.add_argument('--eval_rounds', default=3, type=int)
     parser.add_argument('--eval_prompts_per_round', default=4, type=int)
-    parser.add_argument('--samples_per_eval', default=4, type=int)
+    parser.add_argument('--samples_per_eval', default=3, type=int)
     parser.add_argument('--c', default=1.5, type=float, help='exploration param for UCB. higher = more exploration')
 
     parser.add_argument('--knn_k', default=2, type=int)
@@ -128,7 +129,6 @@ if __name__ == '__main__':
         print("STARTING ROUND ", round + 1)
         start = time.time()
 
-        # if round > 0:
         candidates = optimizer.expand_candidates(candidates, task, gpt4, train_exs)
 
         print(f"candidate counts : {len(candidates)}")
@@ -142,7 +142,7 @@ if __name__ == '__main__':
 
         # record candidates, estimated scores, and true scores
         with open(args.out, 'a') as outf:
-            outf.write(f"======== ROUND {round}\n")
+            outf.write(f"======== ROUND {round + 1}\n")
             outf.write(f'{time.time() - start}\n')
             outf.write(f'{candidates}\n')
             outf.write(f'{scores}\n')
@@ -151,9 +151,19 @@ if __name__ == '__main__':
 
         metrics = []
         for candidate, score in zip(candidates, scores):
-            f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs, n=args.n_test_exs)
-            metrics.append(f1)
-        with open(args.out, 'a') as outf:  
-            outf.write(f'{metrics}\n')
+            if (args.n_test_exs > 100):
+                labels_total = []
+                preds_total = []
+                for i in range(args.n_test_exs // 50):
+                    _, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs[i * 50 : (i + 1) * 50])
+                    labels_total.extend(labels)
+                    preds_total.extend(preds)
+                f1 = f1_score(labels_total, preds_total, average='micro')
+                metrics.append(f1)
+            else:
+                f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs, n=args.n_test_exs)
+                metrics.append(f1)
+            with open(args.out, 'a') as outf:  
+                outf.write(f'{metrics}\n')
 
     print("DONE on train set!")

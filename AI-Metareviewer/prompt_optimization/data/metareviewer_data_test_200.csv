@@ -1,4 +1,3 @@
-id;text;label
 JVtwC9RzlI;"REVIEW 
 Summary:
 This paper proposes a method to integrate the processing and generation of both text and graph data using a single transformer-based model. Structure Token encodes graphs with text labels into a sequence of tokens, enabling the handling of both data types interchangeably. This approach leverages a unified representation within a Transformer Encoder-Decoder model, enhanced to incorporate structure tokens. They evaluate TextGraphBART on text-to-graph (T2G) and graph-to-text (G2T) tasks, demonstrating comparable results to baseline models with fewer parameters.

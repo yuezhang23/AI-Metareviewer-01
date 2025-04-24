@@ -1,13 +1,15 @@
 import requests
 import json
 import concurrent.futures
-import os
 from abc import ABC, abstractmethod
 from typing import List, Dict, Callable
 from tqdm import tqdm
 import pandas as pd
 from sklearn.metrics import accuracy_score, f1_score, classification_report
 from custom_utils import toString
+import psycopg
+from psycopg.rows import dict_row
+import time
 
 class DataProcessor(ABC):
     def __init__(self, data_dir, max_threads=1):
@@ -32,7 +34,6 @@ class DataProcessor(ABC):
 
 
 
-
 def process_example(ex, predictor, prompt):
     pred = predictor.inference(ex, prompt)
     return ex, pred
@@ -40,70 +41,59 @@ def process_example(ex, predictor, prompt):
 
 class ClassificationTask(DataProcessor):
 
-    def run_evaluate(self, predictor, prompt, test_exs, n=100):
+    def run_evaluate(self, predictor, prompt, test_exs, n=100, batch_size=10, max_retries=3):
         labels = []
         preds = []
         texts = []
         
-        # Create checkpoint directory if it doesn't exist
-        checkpoint_dir = os.path.join(self.data_dir, 'checkpoints')
-        os.makedirs(checkpoint_dir, exist_ok=True)
-        checkpoint_file = os.path.join(checkpoint_dir, 'evaluation_progress.json')
+        total_examples = min(n, len(test_exs))
+        total_batches = (total_examples + batch_size - 1) // batch_size
         
-        # Load previous progress if exists
-        if os.path.exists(checkpoint_file):
-            with open(checkpoint_file, 'r') as f:
-                progress = json.load(f)
-                start_idx = progress['last_processed_idx'] + 1
-                labels = progress['labels']
-                preds = progress['preds']
-        else:
-            start_idx = 0
-        
-        batch_size = 50
-        for batch_start in range(start_idx, min(n, len(test_exs)), batch_size):
-            batch_end = min(batch_start + batch_size, n)
-            batch_exs = test_exs[batch_start:batch_end]
-            
-            try:
-                with concurrent.futures.ProcessPoolExecutor(max_workers=self.max_threads) as executor:
-                    futures = [executor.submit(process_example, ex, predictor, prompt) for ex in batch_exs]
-                    for future in tqdm(concurrent.futures.as_completed(futures), 
-                                     total=len(futures), 
-                                     desc=f'Processing batch {batch_start//batch_size + 1}'):
-                        ex, pred = future.result()
-                        texts.append(ex['text'])
-                        labels.append(ex['label'])
-                        preds.append(pred)
+        with tqdm(total=total_examples, desc='Evaluating examples') as pbar:
+            for i in range(0, total_examples, batch_size):
+                batch_exs = test_exs[i:i+batch_size]
+                retry_count = 0
                 
-                # Save progress after each successful batch (only labels and preds)
-                progress = {
-                    'last_processed_idx': batch_end - 1,
-                    'labels': labels,
-                    'preds': preds
-                }
-                with open(checkpoint_file, 'w') as f:
-                    json.dump(progress, f)
-                    
-            except (concurrent.futures.process.BrokenProcessPool, requests.exceptions.SSLError) as e:
-                print(f"Error processing batch {batch_start//batch_size + 1}: {str(e)}")
-                # Remove checkpoint file to indicate incomplete processing
-                if os.path.exists(checkpoint_file):
-                    os.remove(checkpoint_file)
-                raise e
+                while retry_count < max_retries:
+                    try:
+                        if hasattr(predictor, 'batch_inference'):
+                            batch_preds = predictor.batch_inference(batch_exs, prompt)
+                            for ex, pred in zip(batch_exs, batch_preds):
+                                texts.append(ex['text'])
+                                labels.append(ex['label'])
+                                preds.append(pred)
+                            pbar.update(len(batch_exs))
+                            break
+                        else:
+                            with concurrent.futures.ProcessPoolExecutor(max_workers=self.max_threads) as executor:
+                                futures = [executor.submit(process_example, ex, predictor, prompt) for ex in batch_exs]
+                                for future in concurrent.futures.as_completed(futures):
+                                    ex, pred = future.result()
+                                    texts.append(ex['text'])
+                                    labels.append(ex['label'])
+                                    preds.append(pred)
+                                    pbar.update(1)
+                            break
+                    except (concurrent.futures.process.BrokenProcessPool, 
+                           requests.exceptions.SSLError,
+                           requests.exceptions.RequestException) as e:
+                        retry_count += 1
+                        if retry_count == max_retries:
+                            raise Exception(f"Failed after {max_retries} retries: {str(e)}")
+                        time.sleep(2 ** retry_count)  # Exponential backoff
+                        continue
 
         accuracy = accuracy_score(labels, preds)
         f1 = f1_score(labels, preds, average='micro')
         return f1, texts, labels, preds
 
-    def evaluate(self, predictor, prompt, test_exs, n=100):
-        while True:
-            try:
-                f1, texts, labels, preds = self.run_evaluate(predictor, prompt, test_exs, n=n)
-                break
-            except (concurrent.futures.process.BrokenProcessPool, requests.exceptions.SSLError):
-                pass
-        return f1, texts, labels, preds
+    def evaluate(self, predictor, prompt, test_exs, n=100, batch_size=10):
+        try:
+            f1, texts, labels, preds = self.run_evaluate(predictor, prompt, test_exs, n=n, batch_size=batch_size)
+            return f1, texts, labels, preds
+        except Exception as e:
+            print(f"Evaluation failed: {str(e)}")
+            raise
 
 
 class BinaryClassificationTask(ClassificationTask):
@@ -176,15 +166,13 @@ class MetareviewerBinaryTask(BinaryClassificationTask):
     categories = ['No', 'Yes']
 
     def get_train_examples(self):
-        df = pd.read_csv(self.data_dir + 'metareviewer_data_train_200.csv', sep=';')
-        # df = pd.read_csv(self.data_dir + '00metareviewer_data_balanced.csv', sep=';')
+        df = pd.read_csv(self.data_dir + '/metareviewer_data_train_200.csv', sep=';', header=None)
         exs = df.reset_index().to_dict('records')
-        exs = [{'id': x['id'], 'text': x['text'], 'label': int(x['label'])} for x in exs]
+        exs = [{'id': x[0], 'text': x[1], 'label': int(x[2])} for x in exs]
         return exs
     
     def get_test_examples(self):
-        df = pd.read_csv(self.data_dir + 'metareviewer_data_test_200.csv', sep=';')
-        # df = pd.read_csv(self.data_dir + '00metareviewer_data_balanced.csv', sep=';')
+        df = pd.read_csv(self.data_dir + '/metareviewer_data_test_200.csv', sep=';', header=None)
         exs = df.reset_index().to_dict('records')
-        exs = [{'id': x['id'], 'text': x['text'], 'label': int(x['label'])} for x in exs]
+        exs = [{'id': x[0], 'text': x[1], 'label': int(x[2])} for x in exs]
         return exs
