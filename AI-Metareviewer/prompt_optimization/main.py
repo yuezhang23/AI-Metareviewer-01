@@ -124,12 +124,12 @@ if __name__ == '__main__':
 
     candidates = [open(fp.strip()).read() for fp in args.prompts.split(',')]
 
-    for round in tqdm(range(config['rounds'] + 1)):
-        print("STARTING ROUND ", round)
+    for round in tqdm(range(config['rounds'])):
+        print("STARTING ROUND ", round + 1)
         start = time.time()
 
-        if round > 0:
-            candidates = optimizer.expand_candidates(candidates, task, gpt4, train_exs)
+        # if round > 0:
+        candidates = optimizer.expand_candidates(candidates, task, gpt4, train_exs)
 
         print(f"candidate counts : {len(candidates)}")
 

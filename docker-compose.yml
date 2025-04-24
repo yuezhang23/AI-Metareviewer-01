@@ -16,8 +16,8 @@ services:
       context: .
       dockerfile: AI-Metareviewer/Dockerfile
     container_name: ai_metareviewer_container
-    depends_on:
-      - db
+    # depends_on:
+    #   - db
     volumes:
       - ./AI-Metareviewer/prompt_optimization/data:/app/data
       - ./AI-Metareviewer/prompt_optimization:/app
