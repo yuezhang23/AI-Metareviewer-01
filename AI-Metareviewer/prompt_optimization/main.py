@@ -125,7 +125,7 @@ if __name__ == '__main__':
     
     candidates = [open(fp.strip()).read() for fp in args.prompts.split(',')]
 
-    for round in tqdm(1, range(config['rounds'])):
+    for round in tqdm(range(config['rounds'])):
         print("STARTING ROUND ", round + 1)
         start = time.time()
 
