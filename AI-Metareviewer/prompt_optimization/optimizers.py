@@ -132,7 +132,7 @@ class ProTeGi(PromptOptimizer):
             task_section = sections['task'].strip()
 
             # evaluate prompt on minibatch
-            _, texts, labels, preds = task.evaluate(gpt4, prompt, minibatch)
+            _, texts, labels, preds = task.evaluate(gpt4, prompt, minibatch, self.opt['minibatch_size'])
 
             # get gradients
             new_task_sections = []

@@ -11,11 +11,19 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  ai_metareviewer:
+  ai_metareviewer_01:
     build: 
       context: .
       dockerfile: AI-Metareviewer/Dockerfile
-    container_name: ai_metareviewer_container
+    container_name: ai_metareviewer_container_01
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+        reservations:
+          cpus: '2'
+          memory: 2G
     # depends_on:
     #   - db
     volumes:
@@ -31,19 +39,53 @@ services:
         # python main.py &&
         # python failure_analysis.py
         # python testing.py 
-        python main.py --data_dir data/ --out results/meta_review_00.out --evaluator ucb 
-        # python test_eval.py --file_name results/meta_review_00.out --max_threads 16
+        python main.py --data_dir data/ --out results/meta_review_01.out --max_threads 5 --evaluator ucb --eval_rounds 3 --eval_prompts_per_round 4 --samples_per_eval 6
+        # python test_eval.py --file_name results/meta_review_01.out --max_threads 16
       "
     env_file:
       - .env
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_NAME: iclr_reviews
-      DB_USER: postgres
-      DB_PASSWORD: pass
+    # environment:
+    #   DB_HOST: db
+    #   DB_PORT: 5432
+    #   DB_NAME: iclr_reviews
+    #   DB_USER: postgres
+    #   DB_PASSWORD: pass
     ports:
       - "8080:8080"  
+
+  ai_metareviewer_03:
+    build: 
+      context: .
+      dockerfile: AI-Metareviewer/Dockerfile
+    container_name: ai_metareviewer_container_03
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+        reservations:
+          cpus: '2'
+          memory: 2G
+    volumes:
+      - ./AI-Metareviewer/prompt_optimization/data:/app/data
+      - ./AI-Metareviewer/prompt_optimization:/app
+      - ./AI-Metareviewer/setup:/app/setup
+      - ./.env:/app/.env
+    command: >
+      sh -c "
+        # python setup/db_init.py &&
+        # python setup/metareviews.py &&
+        # python setup/reviews.py
+        # python main.py &&
+        # python failure_analysis.py
+        # python testing.py 
+        python main.py --data_dir data/ --out results/meta_review_03.out --max_threads 5 --evaluator ucb --eval_rounds 3 --eval_prompts_per_round 4 --samples_per_eval 10
+        # python test_eval.py --file_name results/meta_review_03.out --max_threads 16
+      "
+    env_file:
+      - .env
+    ports:
+      - "8082:8080"  
 
   pgadmin:
     image: dpage/pgadmin4:latest

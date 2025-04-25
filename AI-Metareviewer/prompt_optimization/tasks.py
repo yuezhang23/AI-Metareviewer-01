@@ -41,7 +41,7 @@ def process_example(ex, predictor, prompt):
 
 class ClassificationTask(DataProcessor):
 
-    def run_evaluate(self, predictor, prompt, test_exs, n=100, batch_size=10, max_retries=3):
+    def run_evaluate(self, predictor, prompt, test_exs, n=100, batch_size=20, max_retries=3):
         labels = []
         preds = []
         texts = []

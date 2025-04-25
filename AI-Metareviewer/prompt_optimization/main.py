@@ -56,14 +56,14 @@ def get_args():
     parser.add_argument('--data_dir', default='data/')
     parser.add_argument('--prompts', default='prompts/metareview.md')
     # parser.add_argument('--config', default='default.json')
-    parser.add_argument('--out', default='test_out.txt')
+    parser.add_argument('--out', default='results/test.out')
     parser.add_argument('--max_threads', default=6, type=int)
     parser.add_argument('--temperature', default=0.0, type=float)
     parser.add_argument('--expansion_temperature', default=0.6, type=float)
     parser.add_argument('--optimizer', default='nl-gradient')
 
     # rounds
-    parser.add_argument('--rounds', default=3, type=int)
+    parser.add_argument('--rounds', default=6, type=int)
     parser.add_argument('--beam_size', default=4, type=int)
     parser.add_argument('--n_test_exs', default=200, type=int) 
     parser.add_argument('--minibatch_size', default=64, type=int)
@@ -122,10 +122,10 @@ if __name__ == '__main__':
 
     with open(args.out, 'a') as outf:
         outf.write(json.dumps(config) + '\n')
-
+    
     candidates = [open(fp.strip()).read() for fp in args.prompts.split(',')]
 
-    for round in tqdm(range(config['rounds'])):
+    for round in tqdm(1, range(config['rounds'])):
         print("STARTING ROUND ", round + 1)
         start = time.time()
 
@@ -145,7 +145,7 @@ if __name__ == '__main__':
             outf.write(f"======== ROUND {round + 1}\n")
             outf.write(f'{time.time() - start}\n')
             outf.write(f'{candidates}\n')
-            outf.write(f'{scores}\n')
+            outf.write(f'{[float(score) for score in scores]}\n')
             # outf.write('f1\n')
 
 
