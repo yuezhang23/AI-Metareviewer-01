@@ -1,0 +1,45 @@
+# how is LLMs able to do in context learning. Does timing matter to test on a samples_per_eval
+
+
+
+
+# does it make a differencd if I test on a prompt at different time (F1 not stable) - how to signal stable F1 score
+
+run many times to get mean standard error, smaller test, larger varirance  
+
+We repeat our experiments five times with different
+random seeds to report the mean and standard deviation
+
+
+
+# what does the highest weight in the proposal distribution mean and how it relates to scoring  Qt
+
+
+
+
+# how does c relates to Qt
+
+
+
+
+# does rounds relate to stable F1 score (learning curve graph)
+
+
+
+
+# does each iteration leads to higher score -- not necessarily, there is c
+
+
+
+
+# does higher scoring leads to  higher F1 score
+
+
+
+
+# does eval-budget relate to F1 score
+
+
+
+
+

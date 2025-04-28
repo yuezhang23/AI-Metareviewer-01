@@ -24,17 +24,14 @@ class BinaryPredictor(GPT4Predictor):
         pred = 1 if response.strip().upper().startswith('YES') else 0
         return pred
 
-    def batch_inference(self, examples, prompt):
-        # Prepare batch of prompts
-        prompts = [Template(prompt).render(text=ex['text']) for ex in examples]
+    # def batch_inference(self, examples, prompt):
+    #     prompts = [Template(prompt).render(text=ex['text']) for ex in examples]
+      
+    #     responses = utils.chatgpt_batch(
+    #         prompts, max_tokens=4, n=1, timeout=8,
+    #         temperature=self.opt['temperature'])
         
-        # Process batch using OpenAI's batch processing
-        responses = utils.chatgpt(
-            prompts, max_tokens=4, n=1, timeout=8,
-            temperature=self.opt['temperature'])
+    #     preds = [1 if response.strip().upper().startswith('YES') else 0 
+    #             for response in responses]
         
-        # Process responses
-        preds = [1 if response.strip().upper().startswith('YES') else 0 
-                for response in responses]
-        
-        return preds
+    #     return preds

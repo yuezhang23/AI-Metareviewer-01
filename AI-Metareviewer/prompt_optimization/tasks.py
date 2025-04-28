@@ -41,17 +41,16 @@ def process_example(ex, predictor, prompt):
 
 class ClassificationTask(DataProcessor):
 
-    def run_evaluate(self, predictor, prompt, test_exs, n=100, batch_size=20, max_retries=3):
+    def run_evaluate(self, predictor, prompt, test_exs, n, batch_size=5, max_retries=3):
+        ids = []
         labels = []
         preds = []
         texts = []
         
-        total_examples = min(n, len(test_exs))
-        total_batches = (total_examples + batch_size - 1) // batch_size
-        
-        with tqdm(total=total_examples, desc='Evaluating examples') as pbar:
-            for i in range(0, total_examples, batch_size):
-                batch_exs = test_exs[i:i+batch_size]
+        total_batches = (n + batch_size - 1) // batch_size
+        with tqdm(total=total_batches, desc='Evaluating examples') as pbar:
+            for i in range(0, n, batch_size):
+                batch_exs = test_exs[i : i + batch_size]
                 retry_count = 0
                 
                 while retry_count < max_retries:
@@ -59,6 +58,7 @@ class ClassificationTask(DataProcessor):
                         if hasattr(predictor, 'batch_inference'):
                             batch_preds = predictor.batch_inference(batch_exs, prompt)
                             for ex, pred in zip(batch_exs, batch_preds):
+                                ids.append(ex['id'])
                                 texts.append(ex['text'])
                                 labels.append(ex['label'])
                                 preds.append(pred)
@@ -69,6 +69,7 @@ class ClassificationTask(DataProcessor):
                                 futures = [executor.submit(process_example, ex, predictor, prompt) for ex in batch_exs]
                                 for future in concurrent.futures.as_completed(futures):
                                     ex, pred = future.result()
+                                    ids.append(ex['id'])
                                     texts.append(ex['text'])
                                     labels.append(ex['label'])
                                     preds.append(pred)
@@ -85,12 +86,12 @@ class ClassificationTask(DataProcessor):
 
         accuracy = accuracy_score(labels, preds)
         f1 = f1_score(labels, preds, average='micro')
-        return f1, texts, labels, preds
+        return ids, f1, texts, labels, preds
 
-    def evaluate(self, predictor, prompt, test_exs, n=100, batch_size=10):
+    def evaluate(self, predictor, prompt, test_exs, n, batch_size=5):
         try:
-            f1, texts, labels, preds = self.run_evaluate(predictor, prompt, test_exs, n=n, batch_size=batch_size)
-            return f1, texts, labels, preds
+            ids, f1, texts, labels, preds = self.run_evaluate(predictor, prompt, test_exs, n=n, batch_size=batch_size)
+            return ids, f1, texts, labels, preds
         except Exception as e:
             print(f"Evaluation failed: {str(e)}")
             raise
