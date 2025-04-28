@@ -1,0 +1,27 @@
+human prompt
+-- 100+100 
+-- prompt '''Analyze the reviews provided, decide if the paper in question would be accepted at an academic conference. 
+The vast majority of papers are accepted. About 0.05 of papers are rejected at the conference.
+Answer only ACCEPT or REJECT'''
+
+Total Predicted Accepted: 75
+Total Predicted Rejected: 78
+Total Actual Accepted: 100
+Total Actual Rejected: 100
+Success Rate on Accept: 0.75
+Benchmark Success Rate on Accept: 0.87
+Success Rate on Reject: 0.78
+Benchmark Success Rate on Reject: 0.63
+predicted F1 Score: 0.7614213197969544
+benchmark F1 Score: 0.7767857142857143
+
+Total Predicted Accepted: 75
+Total Predicted Rejected: 75
+Total Actual Accepted: 100
+Total Actual Rejected: 100
+Success Rate on Accept: 0.75
+Benchmark Success Rate on Accept: 0.87
+Success Rate on Reject: 0.75
+Benchmark Success Rate on Reject: 0.63
+predicted F1 Score: 0.75
+benchmark F1 Score: 0.7767857142857143
