@@ -156,7 +156,7 @@ if __name__ == '__main__':
                 labels_total = []
                 preds_total = []
                 for i in range(args.n_test_exs // 50):
-                    _, f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs[i * 50 : (i + 1) * 50])
+                    _, f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs[i * 50 : (i + 1) * 50], n=50)
                     labels_total.extend(labels)
                     preds_total.extend(preds)
                 f1 = f1_score(labels_total, preds_total, average='micro')
