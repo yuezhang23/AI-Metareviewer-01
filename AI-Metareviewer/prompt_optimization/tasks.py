@@ -9,7 +9,6 @@ from sklearn.metrics import accuracy_score, f1_score, classification_report
 from custom_utils import toString
 import psycopg
 from psycopg.rows import dict_row
-import time
 
 class DataProcessor(ABC):
     def __init__(self, data_dir, max_threads=1):
@@ -34,6 +33,7 @@ class DataProcessor(ABC):
 
 
 
+
 def process_example(ex, predictor, prompt):
     pred = predictor.inference(ex, prompt)
     return ex, pred
@@ -41,60 +41,31 @@ def process_example(ex, predictor, prompt):
 
 class ClassificationTask(DataProcessor):
 
-    def run_evaluate(self, predictor, prompt, test_exs, n, batch_size=5, max_retries=3):
-        ids = []
+    def run_evaluate(self, predictor, prompt, test_exs, n=100):
         labels = []
         preds = []
         texts = []
-        
-        total_batches = (n + batch_size - 1) // batch_size
-        with tqdm(total=total_batches, desc='Evaluating examples') as pbar:
-            for i in range(0, n, batch_size):
-                batch_exs = test_exs[i : i + batch_size]
-                retry_count = 0
-                
-                while retry_count < max_retries:
-                    try:
-                        if hasattr(predictor, 'batch_inference'):
-                            batch_preds = predictor.batch_inference(batch_exs, prompt)
-                            for ex, pred in zip(batch_exs, batch_preds):
-                                ids.append(ex['id'])
-                                texts.append(ex['text'])
-                                labels.append(ex['label'])
-                                preds.append(pred)
-                            pbar.update(len(batch_exs))
-                            break
-                        else:
-                            with concurrent.futures.ProcessPoolExecutor(max_workers=self.max_threads) as executor:
-                                futures = [executor.submit(process_example, ex, predictor, prompt) for ex in batch_exs]
-                                for future in concurrent.futures.as_completed(futures):
-                                    ex, pred = future.result()
-                                    ids.append(ex['id'])
-                                    texts.append(ex['text'])
-                                    labels.append(ex['label'])
-                                    preds.append(pred)
-                                    pbar.update(1)
-                            break
-                    except (concurrent.futures.process.BrokenProcessPool, 
-                           requests.exceptions.SSLError,
-                           requests.exceptions.RequestException) as e:
-                        retry_count += 1
-                        if retry_count == max_retries:
-                            raise Exception(f"Failed after {max_retries} retries: {str(e)}")
-                        time.sleep(2 ** retry_count)  # Exponential backoff
-                        continue
-
+        ids = []
+        with concurrent.futures.ProcessPoolExecutor(max_workers=self.max_threads) as executor:
+            futures = [executor.submit(process_example, ex, predictor, prompt) for ex in test_exs[:n]]
+            for i, future in tqdm(enumerate(concurrent.futures.as_completed(futures)), total=len(futures), desc='running evaluate'):
+                ex, pred = future.result()
+                ids.append(ex['id'])
+                texts.append(ex['text'])
+                labels.append(ex['label'])
+                preds.append(pred)
         accuracy = accuracy_score(labels, preds)
         f1 = f1_score(labels, preds, average='micro')
         return ids, f1, texts, labels, preds
 
-    def evaluate(self, predictor, prompt, test_exs, n, batch_size=5):
-        try:
-            ids, f1, texts, labels, preds = self.run_evaluate(predictor, prompt, test_exs, n=n, batch_size=batch_size)
-            return ids, f1, texts, labels, preds
-        except Exception as e:
-            print(f"Evaluation failed: {str(e)}")
-            raise
+    def evaluate(self, predictor, prompt, test_exs, n=100):
+        while True:
+            try:
+                ids,f1, texts, labels, preds = self.run_evaluate(predictor, prompt, test_exs, n=n)
+                break
+            except (concurrent.futures.process.BrokenProcessPool, requests.exceptions.SSLError):
+                pass
+        return ids,f1, texts, labels, preds
 
 
 class BinaryClassificationTask(ClassificationTask):
@@ -166,14 +137,14 @@ class DefaultHFBinaryTask(BinaryClassificationTask):
 class MetareviewerBinaryTask(BinaryClassificationTask):
     categories = ['No', 'Yes']
 
-    def get_train_examples(self, path):
-        df = pd.read_csv(path, sep=';', header=None)
+    def get_train_examples(self):
+        df = pd.read_csv(self.data_dir + '/metareviewer_data_balanced.csv', sep=';', header=None)
         exs = df.reset_index().to_dict('records')
         exs = [{'id': x[0], 'text': x[1], 'label': int(x[2])} for x in exs]
         return exs
     
-    def get_test_examples(self, path):
-        df = pd.read_csv(path, sep=';', header=None)
+    def get_test_examples(self):
+        df = pd.read_csv(self.data_dir + '/metareviewer_data_balanced.csv', sep=';', header=None)
         exs = df.reset_index().to_dict('records')
         exs = [{'id': x[0], 'text': x[1], 'label': int(x[2])} for x in exs]
         return exs

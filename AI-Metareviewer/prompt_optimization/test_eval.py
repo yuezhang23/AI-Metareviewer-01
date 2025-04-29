@@ -27,26 +27,24 @@ test_exs = task.get_test_examples(args["data_dir"] + '/metareviewer_data_test_20
 
 ids_lables_totals = {}
 for ex in test_exs:
-    ids_lables_totals[ex['id']] = ex['label']
+    ids_lables_totals[ex['id']] = [ex['label']]  # Initialize as list to allow appending
         
 metrics = []
 for candidate in candidates:
-    # f1s = 0.0
-
     trials_ids_preds = {}
     for _ in range(5):   
         sub_ids = []
         sub_preds = []
         for i in range(args["n_test_exs"] // 50):
-            ids, f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs[i * 50 : (i + 1) * 50])
+            ids, f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs[i * 50 : (i + 1) * 50], 200)
             sub_ids.extend(ids)
             sub_preds.extend(preds)
 
-        # for each id, add the pred to the list of preds
         for id, pred in zip(sub_ids, sub_preds):
             if id not in trials_ids_preds:
                 trials_ids_preds[id] = [pred]
-            trials_ids_preds[id].append(pred)
+            else:
+                trials_ids_preds[id].append(pred)
 
     for id, preds in trials_ids_preds.items():
         if len(preds) == 5:
@@ -59,8 +57,8 @@ for candidate in candidates:
     true_labels = [pair[0] for pair in pairs]
     pred_labels = [pair[1] for pair in pairs]
     
-    print(f"len(actual_labels): {len(true_labels)} VS len(pred_labels): {len(pred_labels)}")
+    print(f"len(pred_labels): {len(pred_labels)}")
     f1 = float(f1_score(true_labels, pred_labels, average='micro'))
     metrics.append(f1)
     with open(args["out"], 'a') as outf:  
-        outf.write(f'{metrics}\n')
+        outf.write(f'{f1}\n')  # Write only the new metric
