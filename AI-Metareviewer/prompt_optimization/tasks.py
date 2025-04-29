@@ -65,7 +65,7 @@ class ClassificationTask(DataProcessor):
                 break
             except (concurrent.futures.process.BrokenProcessPool, requests.exceptions.SSLError):
                 pass
-        return ids,f1, texts, labels, preds
+        return ids, f1, texts, labels, preds
 
 
 class BinaryClassificationTask(ClassificationTask):
@@ -133,18 +133,18 @@ class DefaultHFBinaryTask(BinaryClassificationTask):
             exs.append({'id': f'test-{i}', 'label': row['label'], 'text': row['text']})
         return exs
 
-
+# add path as argument
 class MetareviewerBinaryTask(BinaryClassificationTask):
     categories = ['No', 'Yes']
 
-    def get_train_examples(self):
-        df = pd.read_csv(self.data_dir + '/metareviewer_data_balanced.csv', sep=';', header=None)
+    def get_train_examples(self, path):
+        df = pd.read_csv(path, sep=';', header=None)
         exs = df.reset_index().to_dict('records')
         exs = [{'id': x[0], 'text': x[1], 'label': int(x[2])} for x in exs]
         return exs
     
-    def get_test_examples(self):
-        df = pd.read_csv(self.data_dir + '/metareviewer_data_balanced.csv', sep=';', header=None)
+    def get_test_examples(self, path):
+        df = pd.read_csv(path, sep=';', header=None)
         exs = df.reset_index().to_dict('records')
         exs = [{'id': x[0], 'text': x[1], 'label': int(x[2])} for x in exs]
         return exs
