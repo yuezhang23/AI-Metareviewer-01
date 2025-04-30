@@ -2,6 +2,10 @@
 
 
 
+# for ucb
+1. Why sample prompts if we have 8 prompts after each expansion.
+2. 
+
 
 # does it make a differencd if I test on a prompt at different time (F1 not stable) - how to signal stable F1 score
 
@@ -27,7 +31,7 @@ random seeds to report the mean and standard deviation
 
 
 
-# does each iteration leads to higher score -- not necessarily, there is c
+# does each iteration leads to higher score Qt -- not necessarily, there is c
 
 
 
@@ -39,6 +43,8 @@ random seeds to report the mean and standard deviation
 
 # does eval-budget relate to F1 score
 
+
+# how optimization variance impact score
 
 
 

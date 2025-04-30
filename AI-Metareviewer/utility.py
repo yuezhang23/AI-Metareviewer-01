@@ -1,8 +1,3 @@
-import pandas as pd
-import psycopg
-import csv
-from psycopg.rows import dict_row
-import os
 ratingScores = {
     1: "Very Strong Reject: For instance, a paper with incorrect statements, improper (e.g., offensive) language, unaddressed ethical considerations, incorrect results and/or flawed methodology (e.g., training using a test set).",
     2: "Strong Reject: For instance, a paper with major technical flaws, and/or poor evaluation, limited impact, poor reproducibility and mostly unaddressed ethical considerations.",
@@ -31,6 +26,7 @@ miscScores = {
     4: "excellent"
 }
 
+
 fields = ['summary', 'soundness', 'presentation', 'contribution', 'strengths', 'weaknesses', 'limitations', 'rating', 'confidence']
 
 def toString(review):
@@ -49,37 +45,16 @@ def toString(review):
 
     return ret
 
+def getFScore(TP, FP, FN):
+    precision = TP / (TP + FP)
+    recall = TP / (TP + FN)
+    return 2 * precision * recall / (precision + recall)
 
-def get_train_examples():
-    exs = []
-    with psycopg.connect(os.getenv("DB_CONFIG"), row_factory=dict_row) as conn:
-        with conn.cursor() as cur:
-            cur.execute("""(SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%reject%' OFFSET 100 LIMIT 100) UNION ALL 
-                        (SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%accept%' OFFSET 100 LIMIT 100)""")
-            allMetareviews = cur.fetchall()
-            for metareview in allMetareviews:
-                id = metareview["id"]
-                decision = metareview["decision"]
-                promptText = ""
 
-                cur.execute("SELECT * FROM reviews WHERE id = %s", [id])
-                allReviews = cur.fetchall()
-
-                for review in allReviews: 
-                    promptText += toString(review)
-
-                exs.append({'id': id, 'text': promptText, 'label': 1 if "accept" in decision.lower() else 0})
-    header = ['id', 'text', 'label']
-    with open('./data/metareviewer_data_test_200.csv', 'w', newline='', encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=header, delimiter=";")
-        writer.writeheader()  
-        writer.writerows(exs) 
-
-# def get_train_examples():
-#     df = pd.read_csv('./metareviewer_data_test.csv', sep=';', header=None)
-#     exs = df.reset_index().to_dict('records')
-#     exs = [{'id': x[0], 'text': x[1], 'label': int(x[2])} for x in exs]
-#     print(exs)
-#     return exs
-
-get_train_examples()
+def getBenchmarkDecision(arr):
+    totalScore = 0
+    for i in arr:
+        totalScore += i
+    if (totalScore / len(arr) > 5): 
+        return "ACCEPT"
+    return "REJECT"

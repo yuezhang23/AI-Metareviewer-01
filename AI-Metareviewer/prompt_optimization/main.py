@@ -56,15 +56,15 @@ def get_args():
     parser.add_argument('--data_dir', default='data/')
     parser.add_argument('--prompts', default='prompts/metareview.md')
     # parser.add_argument('--config', default='default.json')
-    parser.add_argument('--out', default='results/test.out')
-    parser.add_argument('--max_threads', default=6, type=int)
+    parser.add_argument('--out', default='results/4o-mini/eval_test.out')
+    parser.add_argument('--max_threads', default=8, type=int)
     parser.add_argument('--temperature', default=0.0, type=float)
     parser.add_argument('--expansion_temperature', default=0.6, type=float)
     parser.add_argument('--optimizer', default='nl-gradient')
 
     # rounds
-    parser.add_argument('--rounds', default=3, type=int)
-    parser.add_argument('--beam_size', default=4, type=int)
+    parser.add_argument('--rounds', default=12, type=int)
+    parser.add_argument('--beam_size', default=3, type=int)
     parser.add_argument('--n_test_exs', default=200, type=int) 
     parser.add_argument('--minibatch_size', default=64, type=int)
 
@@ -74,7 +74,7 @@ def get_args():
     parser.add_argument('--gradients_per_error', default=1, type=int)
     parser.add_argument('--steps_per_gradient', default=1, type=int)
     parser.add_argument('--mc_samples_per_step', default=2, type=int)
-    parser.add_argument('--max_expansion_factor', default=8, type=int)
+    parser.add_argument('--max_expansion_factor', default=10, type=int)
 
     parser.add_argument('--engine', default="chatgpt", type=str)
     parser.add_argument('--evaluator', default="bf", type=str)
@@ -82,9 +82,9 @@ def get_args():
 
     # selection parameters
     # optimization steps
-    parser.add_argument('--eval_rounds', default=3, type=int)
-    parser.add_argument('--eval_prompts_per_round', default=4, type=int)
-    parser.add_argument('--samples_per_eval', default=3, type=int)
+    parser.add_argument('--eval_rounds', default=4, type=int)
+    parser.add_argument('--eval_prompts_per_round', default=6, type=int)
+    parser.add_argument('--samples_per_eval', default=15, type=int)
     parser.add_argument('--c', default=1.5, type=float, help='exploration param for UCB. higher = more exploration')
 
     parser.add_argument('--knn_k', default=2, type=int)
@@ -148,7 +148,6 @@ if __name__ == '__main__':
             outf.write(f'{candidates}\n')
             outf.write(f'{[float(score) for score in scores]}\n')
             # outf.write('f1\n')
-
 
         metrics = []
         for candidate, score in zip(candidates, scores):

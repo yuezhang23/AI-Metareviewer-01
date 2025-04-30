@@ -127,12 +127,13 @@ def parse_sectioned_prompt(s):
 #         raise Exception(f"Request failed: {str(e)}")
 
 
-def chatgpt(prompt, temperature=0.7, n=1, top_p=1, stop=None, max_tokens=1024, 
+def chatgpt(prompt, temperature=0.0, n=1, top_p=1, stop=None, max_tokens=1024, 
                   presence_penalty=0, frequency_penalty=0, logit_bias={}, timeout=10):
     messages = [{"role": "user", "content": prompt}]
     payload = {
         "messages": messages,
         "model": "gpt-4o-mini",
+        # "model": "gpt-4.1-nano",
         "temperature": temperature,
         "n": n,
         "top_p": top_p,
@@ -141,8 +142,7 @@ def chatgpt(prompt, temperature=0.7, n=1, top_p=1, stop=None, max_tokens=1024,
         "presence_penalty": presence_penalty,
         "frequency_penalty": frequency_penalty,
         "logit_bias": logit_bias
-    }
-    
+    } 
     max_retries = 5
     base_delay = 1
     
@@ -182,6 +182,7 @@ def instructGPT_logprobs(prompt, temperature=0.7):
     payload = {
         "prompt": prompt,
         "model": "gpt-4o-mini",
+        # "model": "gpt-4.1-nano",
         "temperature": temperature,
         "max_tokens": 1,
         "logprobs": 1,
@@ -209,8 +210,7 @@ def instructGPT_logprobs(prompt, temperature=0.7):
 
 
 
-
-async def _fetch_single_completion(session, prompt, temperature, n, top_p, stop, max_tokens, presence_penalty, frequency_penalty, logit_bias, max_retries=5):
+async def _fetch_single_completion(session, prompt, temperature, n, top_p, stop, max_tokens, presence_penalty, frequency_penalty, logit_bias, max_retries=8):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {config['OPENAI_API_KEY']}",
@@ -218,6 +218,7 @@ async def _fetch_single_completion(session, prompt, temperature, n, top_p, stop,
     }
     payload = {
         "model": "gpt-4o-mini",
+        # "model": "gpt-4.1-nano",
         "messages": [{"role": "user", "content": prompt}],
         "temperature": temperature,
         "n": n,
@@ -235,7 +236,7 @@ async def _fetch_single_completion(session, prompt, temperature, n, top_p, stop,
                 if resp.status == 200:
                     response_json = await resp.json()
                     return response_json["choices"][0]["message"]["content"]
-                elif resp.status == 429:  # Rate limit
+                elif resp.status == 429:  
                     retry_after = int(resp.headers.get('Retry-After', 5))
                     await asyncio.sleep(retry_after)
                     continue
@@ -243,7 +244,7 @@ async def _fetch_single_completion(session, prompt, temperature, n, top_p, stop,
                     error_text = await resp.text()
                     print(f"API Error - Status: {resp.status}, Error: {error_text}")
                     if attempt < max_retries - 1:
-                        await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                        await asyncio.sleep(2 ** attempt) 
                         continue
                     raise Exception(f"Failed single completion: {resp.status}, {error_text}")
         except asyncio.TimeoutError:
