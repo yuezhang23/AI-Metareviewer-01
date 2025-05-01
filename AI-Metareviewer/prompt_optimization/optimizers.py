@@ -100,6 +100,7 @@ class ProTeGi(PromptOptimizer):
         new_prompts = []
         for r in res:   
             new_prompts += self.parse_tagged_text(r, "<START>", "<END>")
+        
         return new_prompts
 
     def generate_synonyms(self, prompt_section, n=3):
@@ -119,6 +120,28 @@ class ProTeGi(PromptOptimizer):
                 task_section, error_string, self.opt['gradients_per_error'], n=1)
             prompt_feedbacks += [(t, error_string) for t in gradients]
         return prompt_feedbacks
+
+
+    def get_coherence_responses(self, candidate_sections, task_section):
+        coherence_responses = []
+        coherent_prompt = f"""
+        Given the following two sections, determine if current section is coherent with the original task section.
+
+        My current section is:
+        "{current_section}"
+
+        The original task section is:
+        {task_section}
+
+        Answer with a boolean value (True or False).
+        """
+        coherent_prompt = '\n'.join([line.lstrip() for line in coherent_prompt.split('\n')])
+        for current_section in candidate_sections:
+            res = utils.chatgpt(coherent_prompt, self.opt['expansion_temperature'], n=1)
+            coherence_responses.append(res[0])
+        # return candidate_sections with true responses
+        return [candidate_sections[i] for i, res in enumerate(coherence_responses) if res == 'True']
+
 
     def expand_candidates(self, prompts, task, gpt4, train_exs):
         """ Expand a list of prompts by generating gradient-based successors and 
@@ -155,9 +178,12 @@ class ProTeGi(PromptOptimizer):
             # combine
             new_sections = new_task_sections + mc_sampled_task_sections
             new_sections = list(set(new_sections)) # dedup
+
+            coherence_responses = self.get_coherence_responses(new_sections, task_section)
+    
             tmp_new_prompts = [
                 prompt.replace(task_section, tmp) 
-                for tmp in new_sections
+                for tmp in coherence_responses
             ]
             
             # filter a little

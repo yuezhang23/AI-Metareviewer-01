@@ -128,12 +128,11 @@ def parse_sectioned_prompt(s):
 
 
 def chatgpt(prompt, temperature=0.0, n=1, top_p=1, stop=None, max_tokens=1024, 
-                  presence_penalty=0, frequency_penalty=0, logit_bias={}, timeout=10):
+                  presence_penalty=0, frequency_penalty=0, logit_bias={}, timeout=10, model="gpt-4o-mini"):
     messages = [{"role": "user", "content": prompt}]
     payload = {
         "messages": messages,
-        "model": "gpt-4o-mini",
-        # "model": "gpt-4.1-nano",
+        "model": model,
         "temperature": temperature,
         "n": n,
         "top_p": top_p,
@@ -178,11 +177,10 @@ def chatgpt(prompt, temperature=0.0, n=1, top_p=1, stop=None, max_tokens=1024,
     raise Exception(f"Failed to get response after {max_retries} retries")
 
 
-def instructGPT_logprobs(prompt, temperature=0.7):
+def instructGPT_logprobs(prompt, temperature=0.7, model="gpt-4o-mini"):
     payload = {
         "prompt": prompt,
-        "model": "gpt-4o-mini",
-        # "model": "gpt-4.1-nano",
+        "model": model,
         "temperature": temperature,
         "max_tokens": 1,
         "logprobs": 1,
@@ -210,15 +208,14 @@ def instructGPT_logprobs(prompt, temperature=0.7):
 
 
 
-async def _fetch_single_completion(session, prompt, temperature, n, top_p, stop, max_tokens, presence_penalty, frequency_penalty, logit_bias, max_retries=8):
+async def _fetch_single_completion(session, prompt, temperature, model, n, top_p, stop, max_tokens, presence_penalty, frequency_penalty, logit_bias, max_retries=8):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {config['OPENAI_API_KEY']}",
         "Content-Type": "application/json"
     }
     payload = {
-        "model": "gpt-4o-mini",
-        # "model": "gpt-4.1-nano",
+        "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "temperature": temperature,
         "n": n,
@@ -258,21 +255,21 @@ async def _fetch_single_completion(session, prompt, temperature, n, top_p, stop,
                 continue
             raise
 
-async def _run_batch(prompts, temperature, n, top_p, stop, max_tokens, presence_penalty, frequency_penalty, logit_bias, timeout=60):
+async def _run_batch(prompts, temperature, model, n, top_p, stop, max_tokens, presence_penalty, frequency_penalty, logit_bias, timeout=60):
     connector = aiohttp.TCPConnector(limit=20)  
     timeout = aiohttp.ClientTimeout(total=timeout)
     async with aiohttp.ClientSession(connector=connector, timeout=timeout) as session:
         tasks = [
-            _fetch_single_completion(session, prompt, temperature, n, top_p, stop, max_tokens, presence_penalty, frequency_penalty, logit_bias)
-            for prompt in prompts
+            _fetch_single_completion(session, prompt, temperature, model, n, top_p, stop, max_tokens, presence_penalty, frequency_penalty, logit_bias)
+            for prompt in prompts   
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
         return results
 
-def chatgpt_batch(prompts, temperature, n=1, top_p=1, stop=None, max_tokens=1024, 
+def chatgpt_batch(prompts, temperature, model="gpt-4o-mini", n=1, top_p=1, stop=None, max_tokens=1024, 
                   presence_penalty=0, frequency_penalty=0, logit_bias={}, timeout=60):
     try:
-        results = asyncio.run(_run_batch(prompts, temperature, n, top_p, stop, max_tokens, presence_penalty, frequency_penalty, logit_bias, timeout))
+        results = asyncio.run(_run_batch(prompts, temperature, model, n, top_p, stop, max_tokens, presence_penalty, frequency_penalty, logit_bias, timeout))
         # Filter out any exceptions and return only successful results
         return [r for r in results if not isinstance(r, Exception)]
     except Exception as e:
