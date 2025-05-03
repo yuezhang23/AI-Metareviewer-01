@@ -51,13 +51,17 @@ def toString(review):
 
 
 def get_train_examples():
-    exs = []
+    # Get test data (100 accept + 100 reject)
+    test_exs = []
     with psycopg.connect(os.getenv("DB_CONFIG"), row_factory=dict_row) as conn:
         with conn.cursor() as cur:
-            cur.execute("""(SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%reject%' OFFSET 100 LIMIT 100) UNION ALL 
-                        (SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%accept%' OFFSET 100 LIMIT 100)""")
-            allMetareviews = cur.fetchall()
-            for metareview in allMetareviews:
+            # Get test data
+            cur.execute("""(SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%reject%' ORDER BY RANDOM() LIMIT 100) 
+                        UNION ALL 
+                        (SELECT id, decision FROM metareviews WHERE LOWER(decision) LIKE '%accept%' ORDER BY RANDOM() LIMIT 100)""")
+            test_metareviews = cur.fetchall()
+            
+            for metareview in test_metareviews:
                 id = metareview["id"]
                 decision = metareview["decision"]
                 promptText = ""
@@ -68,12 +72,54 @@ def get_train_examples():
                 for review in allReviews: 
                     promptText += toString(review)
 
-                exs.append({'id': id, 'text': promptText, 'label': 1 if "accept" in decision.lower() else 0})
+                test_exs.append({'id': id, 'text': promptText, 'label': 1 if "accept" in decision.lower() else 0})
+
+    # Get training data (800 accept + 800 reject)
+    train_exs = []
+    with psycopg.connect(os.getenv("DB_CONFIG"), row_factory=dict_row) as conn:
+        with conn.cursor() as cur:
+            # Get training data (excluding test IDs)
+            test_ids = [ex['id'] for ex in test_exs]
+            test_ids_str = ','.join([f"'{id}'" for id in test_ids])
+            
+            cur.execute(f"""((SELECT id, decision FROM metareviews 
+                            WHERE LOWER(decision) LIKE '%reject%' 
+                            AND id NOT IN ({test_ids_str})
+                            ORDER BY RANDOM() LIMIT 800)
+                        UNION ALL 
+                        (SELECT id, decision FROM metareviews 
+                            WHERE LOWER(decision) LIKE '%accept%' 
+                            AND id NOT IN ({test_ids_str})
+                            ORDER BY RANDOM() LIMIT 800))""")
+            train_metareviews = cur.fetchall()
+            
+            for metareview in train_metareviews:
+                id = metareview["id"]
+                decision = metareview["decision"]
+                promptText = ""
+
+                cur.execute("SELECT * FROM reviews WHERE id = %s", [id])
+                allReviews = cur.fetchall()
+
+                for review in allReviews: 
+                    promptText += toString(review)
+
+                train_exs.append({'id': id, 'text': promptText, 'label': 1 if "accept" in decision.lower() else 0})
+
+    # Save test data
     header = ['id', 'text', 'label']
     with open('./data/metareviewer_data_test_200.csv', 'w', newline='', encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=header, delimiter=";")
         writer.writeheader()  
-        writer.writerows(exs) 
+        writer.writerows(test_exs)
+
+    # Save training data
+    with open('./data/metareviewer_data_train_800.csv', 'w', newline='', encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=header, delimiter=";")
+        writer.writeheader()  
+        writer.writerows(train_exs)
+
+    return train_exs, test_exs
 
 # def get_train_examples():
 #     df = pd.read_csv('./metareviewer_data_test.csv', sep=';', header=None)

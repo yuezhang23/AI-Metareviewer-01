@@ -1,5 +1,14 @@
 # how is LLMs able to do in context learning. Does timing matter to test on a samples_per_eval
 
+# what does overfitting mean in ICL if the weights are not updated
+
+# early rounds don't necessarily increase the F1 score for candidate prompts, showing that improving scores only leads to overfitting
+
+
+
+
+
+
 
 
 # for ucb
@@ -49,3 +58,5 @@ random seeds to report the mean and standard deviation
 
 
 
+#  scores = 1 at very early rounds
+#  adversi examples at early rounds

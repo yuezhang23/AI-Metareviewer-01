@@ -2,6 +2,7 @@ import psycopg
 from dotenv import dotenv_values
 
 config = dotenv_values(".env")
+# with psycopg.connect("dbname=iclr_reviews user=postgres password=pass host=db port=5432") as conn:
 with psycopg.connect(config["DB_CONFIG"]) as conn:
     with conn.cursor() as cur:
         cur.execute("""

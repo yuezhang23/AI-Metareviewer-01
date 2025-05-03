@@ -4,7 +4,7 @@ from liquid import Template
 
 import utils
 import tasks
-
+import utils_ds
 class GPT4Predictor(ABC):
     def __init__(self, opt):
         self.opt = opt
@@ -44,6 +44,9 @@ class DeepSeekPredictor(GPT4Predictor):
     categories = ['No', 'Yes']
 
     def inference(self, ex, prompt):
-        prompt = Template(prompt).render(text=ex['text'])
-        response = utils.chatgpt(prompt, max_tokens=4, n=1, timeout=20, temperature=self.opt['temperature'], model=self.opt['model'])[0]
+        sections = utils.parse_sectioned_prompt(prompt)
+        task_section = sections['task'].strip()
+
+        response = utils_ds.make_decision(ex['text'], task_section, temperature=self.opt['temperature'] , model=self.opt['model'])
         pred = 1 if response.strip().upper().startswith('YES') else 0
+        return pred

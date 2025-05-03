@@ -1,0 +1,82 @@
+--------- ppt-01
+      gradient_prompt = f"""
+        I'm trying to write a zero-shot classifier prompt.
+    
+        My current prompt is:
+        "{prompt}"
+
+        But this prompt gets the following examples wrong:
+        {error_string}
+
+        give {num_feedbacks} reasons why the prompt could have gotten these examples wrong.
+        The most likely reasons are based on the examples that were most frequently misclassified.
+        Wrap each reason with <START> and <END>
+        """
+
+
+--------- ppt-02 
+gradient_prompt = f"""
+        I'm trying to write a zero-shot classifier prompt.
+    
+        My current prompt is:
+        "{prompt}"
+
+        But this prompt gets the following examples wrong:
+        {error_string}
+
+        Provide {num_feedbacks - 2} general reasons the prompt have failed on these examples, and add 2 specific reasons that were repeatedly mentioned in the feedback.
+        
+        Wrap each reason with <START> and <END>
+        """
+
+
+
+------- ppt-03
+
+    def _get_gradients(self, prompt, error_string, num_feedbacks=5, n=1):
+        """ Get "gradients" for a prompt based on the error string."""
+        gradient_prompt = f"""
+        I'm trying to write a zero-shot classifier prompt.
+    
+        My current prompt is:
+        "{prompt}"
+
+        But this prompt gets the following examples wrong:
+        {error_string}
+
+        give {num_feedbacks} different reasons why the prompt incorrectly classified these examples.
+        Wrap each reason with <START> and <END>
+        """
+        gradient_prompt = '\n'.join([line.lstrip() for line in gradient_prompt.split('\n')])
+        res = utils.chatgpt(gradient_prompt, self.opt['expansion_temperature'], n=n)
+        feedbacks = []
+        new_prompts = []
+        for r in res:    
+            feedbacks += self.parse_tagged_text(r, "<START>", "<END>")
+        return feedbacks
+
+    def apply_gradient(self, prompt, error_str, feedback_str, steps_per_gradient, n=1):
+        """ Incorporate feedback gradient into a prompt."""
+        transformation_prompt = f"""
+        I'm trying to write a zero-shot classifier.
+        
+        My current prompt is:
+        "{prompt}"
+
+        But it gets the following examples wrong:
+        {error_str}
+
+        Based on these examples the problem with this prompt is that {feedback_str}
+
+        Summarize the above information and write {steps_per_gradient} different improved prompts.
+        Each prompt is wrapped with <START> and <END>.
+
+        The {steps_per_gradient} new prompts are:
+        """
+        transformation_prompt = '\n'.join([line.lstrip() for line in transformation_prompt.split('\n')])
+        res = utils.chatgpt(transformation_prompt, self.opt['expansion_temperature'], n=n)
+        new_prompts = []
+        for r in res:   
+            new_prompts += self.parse_tagged_text(r, "<START>", "<END>")
+        
+        return new_prompts
