@@ -1,0 +1,19 @@
+Inital prompt: 
+
+
+----  Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference. 
+
+args: {'n_test_exs': 200, 'temperature': 0.0, 'out': 'results/41-nano/eval_sg.out', 'model': 'gpt-4.1-nano'}
+Step 0: 0.5
+
+args: {'n_test_exs': 200, 'temperature': 0.0, 'out': 'results/41-nano/eval_sg.out', 'model': 'gpt-4o-mini'}
+Step 0: 0.5
+
+
+---- Given the following reviews, determine if the paper being reviewed would be accepted at an academic conference.
+
+args: {'n_test_exs': 200, 'temperature': 0.0, 'out': 'results/initial_prompts.out', 'model': 'gpt-4.1-nano'}
+Step 0: 0.5
+
+args: {'n_test_exs': 200, 'temperature': 0.0, 'out': 'results/initial_prompts.out', 'model': 'gpt-4o-mini'}
+Step 0: 0.5
