@@ -128,7 +128,7 @@ def parse_sectioned_prompt(s):
 
 
 def chatgpt(prompt, model, temperature=0.0, n=1, top_p=1, stop=None, max_tokens=1024, 
-                  presence_penalty=0, frequency_penalty=0, logit_bias={}, timeout=10):
+                  presence_penalty=0, frequency_penalty=0, logit_bias={}, timeout=30):
     messages = [{"role": "user", "content": prompt}]
     payload = {
         "messages": messages,
@@ -142,7 +142,7 @@ def chatgpt(prompt, model, temperature=0.0, n=1, top_p=1, stop=None, max_tokens=
         "frequency_penalty": frequency_penalty,
         "logit_bias": logit_bias
     } 
-    max_retries = 5
+    max_retries = 6
     base_delay = 1
     
     for retry in range(max_retries):

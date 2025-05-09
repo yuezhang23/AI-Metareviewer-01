@@ -19,7 +19,7 @@ class Cached01Scorer:
     def __call__(self, predictor, prompts, data, agg='mean', max_threads=1):
         def compute_scores(prompts_exs):
             out_scores = {}
-            inputs = [(ex, predictor, prompt, 'gpt-4.1-nano') for prompt, ex in prompts_exs]
+            inputs = [(ex, predictor, prompt, 'gpt-4o-mini') for prompt, ex in prompts_exs]
             with concurrent.futures.ProcessPoolExecutor(max_workers=max_threads) as executor:
                 futures = [executor.submit(predict_on_example, ex) for ex in inputs]
                 for i, future in tqdm(enumerate(concurrent.futures.as_completed(futures)), total=len(futures), desc='01 scorer'):

@@ -10,7 +10,7 @@ class GPT4Predictor(ABC):
         self.opt = opt
 
     @abstractmethod
-    def inference(self, ex, prompt):
+    def inference(self, ex, prompt, model):
         pass
 
 class BinaryPredictor(GPT4Predictor):
