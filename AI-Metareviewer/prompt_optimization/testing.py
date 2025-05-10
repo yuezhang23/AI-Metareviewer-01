@@ -121,6 +121,57 @@ def get_train_examples():
 
     return train_exs, test_exs
 
+def get_additional_train_examples():
+    # Read existing data from data.csv
+    existing_ids = set()
+    try:
+        with open('./data/metareviewer_data_train_800.csv', 'r', newline='', encoding="utf-8") as file:
+            reader = csv.DictReader(file, delimiter=";")
+            for row in reader:
+                existing_ids.add(row['id'])
+    except FileNotFoundError:
+        print("data.csv not found. Starting with empty set of existing IDs.")
+
+    # Get additional training data (800 examples)
+    additional_exs = []
+    with psycopg.connect(os.getenv("DB_CONFIG"), row_factory=dict_row) as conn:
+        with conn.cursor() as cur:
+            # Get additional training data (excluding existing IDs)
+            existing_ids_str = ','.join([f"'{id}'" for id in existing_ids]) if existing_ids else "''"
+            
+            cur.execute(f"""((SELECT id, decision FROM metareviews 
+                            WHERE LOWER(decision) LIKE '%reject%' 
+                            AND id NOT IN ({existing_ids_str})
+                            ORDER BY RANDOM() LIMIT 800)
+                        UNION ALL 
+                        (SELECT id, decision FROM metareviews 
+                            WHERE LOWER(decision) LIKE '%accept%' 
+                            AND id NOT IN ({existing_ids_str})
+                            ORDER BY RANDOM() LIMIT 800))""")
+            additional_metareviews = cur.fetchall()
+            
+            for metareview in additional_metareviews:
+                id = metareview["id"]
+                decision = metareview["decision"]
+                promptText = ""
+
+                cur.execute("SELECT * FROM reviews WHERE id = %s", [id])
+                allReviews = cur.fetchall()
+
+                for review in allReviews: 
+                    promptText += toString(review)
+
+                additional_exs.append({'id': id, 'text': promptText, 'label': 1 if "accept" in decision.lower() else 0})
+
+    # Save additional data
+    header = ['id', 'text', 'label']
+    with open('./data/additional_data_800+800.csv', 'w', newline='', encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=header, delimiter=";")
+        writer.writeheader()  
+        writer.writerows(additional_exs)
+
+    return additional_exs
+
 # def get_train_examples():
 #     df = pd.read_csv('./metareviewer_data_test.csv', sep=';', header=None)
 #     exs = df.reset_index().to_dict('records')
@@ -128,4 +179,5 @@ def get_train_examples():
 #     print(exs)
 #     return exs
 
-get_train_examples()
+# get_train_examples()
+get_additional_train_examples()

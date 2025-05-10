@@ -7,19 +7,20 @@ import concurrent.futures
 
 
 def predict_on_example(inputs):
-    ex, predictor, prompt, model = inputs
-    pred = predictor.inference(ex, prompt, model)
+    ex, predictor, prompt = inputs
+    pred = predictor.inference(ex, prompt)
     return prompt, ex, pred
 
 class Cached01Scorer:
 
-    def __init__(self):
+    def __init__(self, config):
         self.cache = {}
+        self.config = config
 
     def __call__(self, predictor, prompts, data, agg='mean', max_threads=1):
         def compute_scores(prompts_exs):
             out_scores = {}
-            inputs = [(ex, predictor, prompt, 'gpt-4o-mini') for prompt, ex in prompts_exs]
+            inputs = [(ex, predictor, prompt) for prompt, ex in prompts_exs]
             with concurrent.futures.ProcessPoolExecutor(max_workers=max_threads) as executor:
                 futures = [executor.submit(predict_on_example, ex) for ex in inputs]
                 for i, future in tqdm(enumerate(concurrent.futures.as_completed(futures)), total=len(futures), desc='01 scorer'):

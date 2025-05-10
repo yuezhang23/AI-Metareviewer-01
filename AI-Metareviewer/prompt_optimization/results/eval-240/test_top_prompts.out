@@ -1,0 +1,39 @@
+args: {'n_test_exs': 200, 'temperature': 0.0, 'out': 'results/01bf/eval-240/test_top_prompts.out', 'model': 'gpt-4o-mini'}
+--- round 0
+--- round 1
+[0.705,    0.7,        0.725, 0.75, 0.73,    0.74, 0.725, 0.72]
+
+--- round 2
+1  1  3   3  2   3   3
+args: {'n_test_exs': 200, 'temperature': 0.0, 'out': 'results/01bf/eval-240/test_top_prompts.out', 'model': 'gpt-4o-mini'}
+
+--- round 3
+args: {'n_test_exs': 200, 'temperature': 0.0, 'out': 'results/01bf/eval-240/test_top_prompts.out', 'model': 'gpt-4o-mini'}
+
+--- round 4
+args: {'n_test_exs': 200, 'temperature': 0.0, 'out': 'results/01bf/eval-240/test_top_prompts.out', 'model': 'gpt-4o-mini'}
+
+
+44310-ori  44310         44320-ucb              44311                 44312           44610-ucb              66112-bf
+[0.725,   0.745,   0.74, 0.74, 0.74,    0.74, 0.72, 0.72,      0.725, 0.715,   0.725, 0.735, 0.725,   0.735 ,0.73, 0.735],
+[0.715,   0.705,   0.725, 0.74, 0.73,   0.725, 0.72, 0.695,    0.735, 0.71,    0.75, 0.73, 0.72,      0.72, 0.725, 0.725],
+[0.715,   0.705,   0.72, 0.76, 0.735,   0.74, 0.71, 0.72,      0.74, 0.7,      0.745, 0.715, 0.72,    0.725, 0.725, 0.73],
+[0.73,    0.745,   0.725, 0.75, 0.75,   0.725, 0.71, 0.72,     0.72, 0.715,    0.745, 0.725, 0.71,    0.725, 0.725, 0.73]
+[0.73,    0.73,    0.73, 0.73, 0.74,    0.73, 0.7, 0.725,      0.73, 0.715,    0.735, 0.725, 0.72,    0.725, 0.725, 0.725]
+[0.73,    0.715,   0.73, 0.75, 0.745,   0.755, 0.715, 0.73,    0.725, 0.7,     0.735, 0.74, 0.725,    0.73, 0.715, 0.71]
+
+### imbalanced test  
+args: {'n_test_exs': 200, 'temperature': 0.0, 'out': 'results/01bf/eval-240/test_top_prompts.out', 'model': 'gpt-4o-mini'}
+     44320/3                44610/3
+[0.73, 0.755, 0.745,    0.76,  0.73, 0.73]
+[0.735, 0.75, 0.74,     0.755, 0.725, 0.715]
+[0.745, 0.74, 0.755,    0.735, 0.72, 0.71]
+[0.74, 0.74, 0.755,     0.755, 0.715, 0.735]
+[0.73, 0.74, 0.745,     0.74, 0.72, 0.715]
+
+args: {'task': 'metareviewer', 'data_dir': 'data/', 'prompts': 'prompts/metareview.md', 'model': 'gpt-4o-mini', 'eval_model': 'gpt-4o-mini', 'out': 'results/eval-240/test_top_prompts.out', 'max_threads': 8, 'temperature': 0.0, 'expansion_temperature': 0.7, 'optimizer': 'nl-gradient', 'rounds': 8, 'beam_size': 5, 'n_test_exs': 200, 'minibatch_size': 64, 'n_gradients': 6, 'errors_per_gradient': 4, 'gradients_per_error': 3, 'steps_per_gradient': 2, 'mc_samples_per_step': 0, 'max_expansion_factor': 6, 'engine': 'chatgpt', 'evaluator': 'bf', 'scorer': '01', 'eval_rounds': 5, 'eval_prompts_per_round': 6, 'samples_per_eval': 8, 'c': 2.0, 'knn_k': 2, 'knn_t': 0.993, 'reject_on_errors': False, 'eval_budget': 240}
+[0.755]
+[0.74]
+[0.745]
+[0.735]
+[0.745]

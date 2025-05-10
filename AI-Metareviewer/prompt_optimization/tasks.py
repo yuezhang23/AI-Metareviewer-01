@@ -34,14 +34,14 @@ class DataProcessor(ABC):
 
 
 
-def process_example(ex, predictor, prompt, model):
-    pred = predictor.inference(ex, prompt, model)
+def process_example(ex, predictor, prompt):
+    pred = predictor.inference(ex, prompt)
     return ex, pred
 
 
 class ClassificationTask(DataProcessor):
 
-    def run_evaluate(self, predictor, prompt, model, test_exs, n, batch_size, max_retries=3):
+    def run_evaluate(self, predictor, prompt, test_exs, n, batch_size, max_retries=3):
         ids = []
         labels = []
         preds = []
@@ -58,7 +58,7 @@ class ClassificationTask(DataProcessor):
                     
                     while retry_count < max_retries:
                         try:
-                            batch_preds = predictor.batch_inference(batch_exs, prompt, model)
+                            batch_preds = predictor.batch_inference(batch_exs, prompt)
                             for ex, pred in zip(batch_exs, batch_preds):
                                 ids.append(ex['id'])
                                 texts.append(ex['text'])
@@ -76,7 +76,7 @@ class ClassificationTask(DataProcessor):
         else:
             with tqdm(total=total_examples, desc='Evaluating examples') as pbar:
                 with concurrent.futures.ProcessPoolExecutor(max_workers=self.max_threads) as executor:
-                    futures = [executor.submit(process_example, ex, predictor, prompt, model) for ex in test_exs[:total_examples]]
+                    futures = [executor.submit(process_example, ex, predictor, prompt) for ex in test_exs[:total_examples]]
                     for future in concurrent.futures.as_completed(futures): 
                         try:
                             ex, pred = future.result()
@@ -93,9 +93,9 @@ class ClassificationTask(DataProcessor):
         f1 = f1_score(labels, preds, average='micro')
         return ids, f1, texts, labels, preds
 
-    def evaluate(self, predictor, prompt, model, test_exs, n=400, batch_size=4):
+    def evaluate(self, predictor, prompt, test_exs, n=400, batch_size=4):
         try:
-            ids, f1, texts, labels, preds = self.run_evaluate(predictor, prompt, model, test_exs, n=n, batch_size=batch_size)
+            ids, f1, texts, labels, preds = self.run_evaluate(predictor, prompt, test_exs, n=n, batch_size=batch_size)
             return ids, f1, texts, labels, preds
         except Exception as e:
             print(f"Evaluation failed: {str(e)}")

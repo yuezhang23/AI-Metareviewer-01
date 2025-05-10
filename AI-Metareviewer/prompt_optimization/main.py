@@ -60,25 +60,25 @@ def get_args():
     parser.add_argument('--eval_model', default='gpt-4o-mini')
     
     # parser.add_argument('--config', default='default.json')
-    parser.add_argument('--out', default='results/01bf/eval-240/bf-mini-eval240-ppt03-tp0.7-bs5-48520.out')
+    parser.add_argument('--out', default='results/eval-240/ucb-mini-eval240-ppt03-tp0.7-bs5-64320-max-8.out')
     parser.add_argument('--max_threads', default=8, type=int)
     parser.add_argument('--temperature', default=0.0, type=float)
     parser.add_argument('--expansion_temperature', default=0.7, type=float)
     parser.add_argument('--optimizer', default='nl-gradient')
 
     # rounds
-    parser.add_argument('--rounds', default=6, type=int)
+    parser.add_argument('--rounds', default=8, type=int)
     parser.add_argument('--beam_size', default=5, type=int)
     parser.add_argument('--n_test_exs', default=200, type=int) 
     parser.add_argument('--minibatch_size', default=64, type=int)
 
     # expansion parameters
-    parser.add_argument('--n_gradients', default=4, type=int)   
-    parser.add_argument('--errors_per_gradient', default=8, type=int)
-    parser.add_argument('--gradients_per_error', default=5, type=int)
+    parser.add_argument('--n_gradients', default=6, type=int)   
+    parser.add_argument('--errors_per_gradient', default=4, type=int)
+    parser.add_argument('--gradients_per_error', default=3, type=int)
     parser.add_argument('--steps_per_gradient', default=2, type=int)
     parser.add_argument('--mc_samples_per_step', default=0, type=int)
-    parser.add_argument('--max_expansion_factor', default=6, type=int)
+    parser.add_argument('--max_expansion_factor', default=8, type=int)
 
     parser.add_argument('--engine', default="chatgpt", type=str)
     parser.add_argument('--evaluator', default="ucb", type=str)
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     config['eval_budget'] = config['samples_per_eval'] * config['eval_rounds'] * config['eval_prompts_per_round']
     
     task = get_task_class(args.task)(args.data_dir, args.max_threads)
-    scorer = get_scorer(args.scorer)()
+    scorer = get_scorer(args.scorer)(config)
     evaluator = get_evaluator(args.evaluator)(config)
     bf_eval = get_evaluator('bf')(config)
 
@@ -134,6 +134,8 @@ if __name__ == '__main__':
         outf.write(json.dumps(config) + '\n')
     
     candidates = [open(fp.strip()).read() for fp in args.prompts.split(',')]
+
+
 
     for round in tqdm(range(config['rounds'])):
         print("STARTING ROUND ", round + 1)
@@ -162,7 +164,7 @@ if __name__ == '__main__':
                 labels_total = []
                 preds_total = []
                 for i in range(args.n_test_exs // 50):
-                    _, f1, texts, labels, preds = task.evaluate(gpt4, candidate, args.eval_model, test_exs[i * 50 : (i + 1) * 50], n=50)
+                    _, f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs[i * 50 : (i + 1) * 50], n=50)
                     labels_total.extend(labels)
                     preds_total.extend(preds)
                 f1 = f1_score(labels_total, preds_total, average='micro')

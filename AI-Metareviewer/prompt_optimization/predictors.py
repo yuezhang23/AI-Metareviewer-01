@@ -10,28 +10,28 @@ class GPT4Predictor(ABC):
         self.opt = opt
 
     @abstractmethod
-    def inference(self, ex, prompt, model):
+    def inference(self, ex, prompt):
         pass
 
 class BinaryPredictor(GPT4Predictor):
     categories = ['No', 'Yes']
 
-    def inference(self, ex, prompt, model):
+    def inference(self, ex, prompt):
         prompt = Template(prompt).render(text=ex['text'])
         response = utils.chatgpt(
             prompt, max_tokens=4, n=1, timeout=20, 
-            temperature=self.opt['temperature'], model=model)[0]
+            temperature=self.opt['temperature'], model=self.opt['eval_model'])[0]
         pred = 1 if response.strip().upper().startswith('YES') else 0
         return pred
 
-    def batch_inference(self, examples, prompt, model):
+    def batch_inference(self, examples, prompt):
         # Prepare batch of prompts
         prompts = [Template(prompt).render(text=ex['text']) for ex in examples]
         
         # Process batch using OpenAI's batch processing
         responses = utils.chatgpt_batch(
             prompts, max_tokens=4, n=1, timeout=20,
-            temperature=self.opt['temperature'], model=model)
+            temperature=self.opt['temperature'], model=self.opt['eval_model'])
         
         # Process responses
         preds = [1 if response.strip().upper().startswith('YES') else 0 
@@ -42,10 +42,10 @@ class BinaryPredictor(GPT4Predictor):
 class DeepSeekPredictor(GPT4Predictor):
     categories = ['No', 'Yes']
 
-    def inference(self, ex, prompt, model):
+    def inference(self, ex, prompt):
         sections = utils.parse_sectioned_prompt(prompt)
         task_section = sections['task'].strip()
 
-        response = utils_ds.make_decision(ex['text'], task_section, temperature=self.opt['temperature'] , model=model)
+        response = utils_ds.make_decision(ex['text'], task_section, temperature=self.opt['temperature'] , model=self.opt['eval_model'])
         pred = 1 if response.strip().upper().startswith('YES') else 0
         return pred

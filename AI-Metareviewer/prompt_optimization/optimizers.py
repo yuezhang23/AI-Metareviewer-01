@@ -28,7 +28,6 @@ class ProTeGi(PromptOptimizer):
                 error_idxs.append(i)
 
         sample_idxs = random.sample(error_idxs, min(len(error_idxs), n))
-
         sample_texts = [texts[i] for i in sample_idxs]
         sample_labels = [labels[i] for i in sample_idxs]
         sample_preds = [preds[i] for i in sample_idxs]
@@ -101,7 +100,6 @@ class ProTeGi(PromptOptimizer):
         new_prompts = []
         for r in res:   
             new_prompts += self.parse_tagged_text(r, "<START>", "<END>")
-        
         return new_prompts
 
     def generate_synonyms(self, prompt_section, n=3):
@@ -132,7 +130,7 @@ class ProTeGi(PromptOptimizer):
         new_responses = []
         for prompt in tqdm(prompts, desc=f'expanding {len(prompts)} prompts'):
             # evaluate prompt on minibatch
-            _, f1, texts, labels, preds = task.evaluate(gpt4, prompt, self.opt['eval_model'], minibatch, self.opt['minibatch_size'], )
+            _, f1, texts, labels, preds = task.evaluate(gpt4, prompt, minibatch, self.opt['minibatch_size'], )
             print(f"\n\ncheck f1 on tr-64: {f1}\n\n")
             new_responses.append([f1, texts, labels, preds])
 
