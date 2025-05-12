@@ -5,11 +5,11 @@ Utilizing LLMs as Academic Chairs for Top ML Conferences
 This study focuses on optimizing nonparametric algorithms for academic paper review decisions. The original ProTeGi algorithm was implemented without hyperparameter optimization. This work explores various hyperparameter combinations to enhance generalization performance, building upon previous human prompting results.
 
 ### Previous Results
-#### Biased Prompt Approach
+#### Biased Prompt 
 - Prompt: "Analyze the reviews provided, decide if the paper in question would be accepted at an academic conference. The vast majority of papers are accepted. About 0.05 of papers are rejected at the conference. Answer only ACCEPT or REJECT"
 - Performance: Test F1 - 4o-mini: 0.75
 
-#### Neutral Prompt Approaches
+#### Neutral Prompts
 1. Option 1: "Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference."
    - Test F1 - 4o-mini: 0.692
    - Test F1 - 4.1-nano: 0.55
@@ -65,7 +65,7 @@ Parameters:
 ### Evaluation Budget Impact
 The paper has shown that most of the algorithms improved as the budget increases. The evaluation budget is calculated as:
 ```
-eval_budget = samples_per_eval × eval_rounds × eval_prompts_per_round
+config['eval_budget'] = config['samples_per_eval'] * config['eval_rounds'] * config['eval_prompts_per_round']
 ```
 
 ### Reflection on Eval_budget
