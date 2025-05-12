@@ -15,7 +15,7 @@ if __name__ == '__main__':
     # Round - from prior results
     # candidates = ["Given the following reviews, determine if the paper being reviewed would be accepted at an academic conference."]
 
-    candidates = ["# Task\nExamine the evaluations provided for the academic paper and determine its overall quality by pinpointing key strengths and weaknesses. In your assessment, evaluate the soundness of the methodology, the clarity of the presentation, the significance of the contributions, and the originality of the research. Give special consideration to how effectively the paper addresses its limitations and whether it offers adequate context for its assertions. Analyze the degree to which the experimental design—particularly the selection of datasets and tasks—bolsters the findings. Decide if the paper’s strengths significantly surpass its weaknesses, particularly in terms of its potential impact on the field and its appropriateness for acceptance at an academic conference. Deliver a comprehensive evaluation of the paper's contributions and relevance. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:", ]
+    candidates = ["# Task\n Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:", ]
 
 
     args = {"task": "metareviewer", "data_dir": "data/", "prompts": "prompts/metareview.md", "model": "gpt-4.1-nano", "eval_model": "gpt-4.1-nano", "out": "results/eval-240/test_top_prompts.out", "max_threads": 8, "temperature": 0.0, "expansion_temperature": 0.7, "optimizer": "nl-gradient", "rounds": 8, "beam_size": 5, "n_test_exs": 200, "minibatch_size": 64, "n_gradients": 4, "errors_per_gradient": 4, "gradients_per_error": 1, "steps_per_gradient": 1, "mc_samples_per_step": 2, "max_expansion_factor": 8, "engine": "chatgpt", "evaluator": "bf", "scorer": "01", "eval_rounds": 5, "eval_prompts_per_round": 6, "samples_per_eval": 8, "c": 2.0, "knn_k": 2, "knn_t": 0.993, "reject_on_errors": False, "eval_budget": 240}
@@ -29,7 +29,7 @@ if __name__ == '__main__':
     test_exs = task.get_test_examples('data/metareviewer_data_test_200.csv')
             
 
-    for _ in range(4):   
+    for _ in range(5):   
         # test_batch = random.sample(test_exs, k=args["n_test_exs"])
         test_batch = test_exs
         f1s = []

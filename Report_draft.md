@@ -1,70 +1,75 @@
-# Task
-Utilize LLMs to be an Academic Chair for top ML conferences.
+# Task: Utilizing LLMs as Academic Chairs for Top ML Conferences
 
-## Background
-As the focus of the paper is nonparametric algorithms with broad applicability, there was no hyperparameter search for the proposed ProTeGi algorithm. For this specific task, I experimented on a list of combinations of hyperparameters for the algorithm in order to achieve higher generalization performance. Prior work includes some human prompting results, shown below.
+## Background 
+This study focuses on optimizing nonparametric algorithms for academic paper review decisions. The original ProTeGi algorithm was implemented without hyperparameter optimization. This work explores various hyperparameter combinations to enhance generalization performance, building upon previous human prompting results.
 
-#### Biased Prompt 
-- `Analyze the reviews provided, decide if the paper in question would be accepted at an academic conference. The vast majority of papers are accepted. About 0.05 of papers are rejected at the conference. Answer only ACCEPT or REJECT`
+### Previous Results
+#### Biased Prompt Approach
+- Prompt: "Analyze the reviews provided, decide if the paper in question would be accepted at an academic conference. The vast majority of papers are accepted. About 0.05 of papers are rejected at the conference. Answer only ACCEPT or REJECT"
+- Performance: Test F1 - 4o-mini: 0.75
 
-- Test F1 score: 0.75
+#### Neutral Prompt Approaches
+1. Option 1: "Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference."
+   - Test F1 - 4o-mini: 0.692
+   - Test F1 - 4.1-nano: 0.55
 
-#### Neutral Prompts (Initial prompt sections for APO)
-- Opt 1: `Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference.`
-- Test F1 score: 0.5
+2. Option 2: "Given the following reviews, determine if the paper being reviewed would be accepted at an academic conference."
+   - Test F1 - 4o-mini: 0.65
+   - Test F1 - 4.1-nano: 0.525
 
-- Opt 2: `Given the following reviews, determine if the paper being reviewed would be accepted at an academic conference.`
-- Test F1 score: 0.5
+## Experimental Setup
 
-## Settings
-Below is a list of settings that are unique or changed to this task.
-
-### Data
+### Dataset Configuration
 - Source: venue_id = '[NeurIPS.cc/2024/Conference](https://neurips.cc/Conferences/2024)'
 - Training dataset: 800 accept + 800 reject
 - Test dataset: 800 accept + 800 reject
 - Test data: 100 accept + 100 reject
 
-### Setup 
-- "model": ["gpt-4o-mini", "gpt-4.1-nano"]
-- "eval_model": ["gpt-4o-mini", "gpt-4.1-nano"]
-- "beam_size": 5
-- "n_test_exs": 200
+### Model Configuration
+- Models: ["gpt-4o-mini", "gpt-4.1-nano"]
+- Evaluation Models: ["gpt-4o-mini", "gpt-4.1-nano"]
+- Beam Size: 5
+- Test Examples: 200
+
+### Hyperparameter Configurations
 
 #### Expansion Hyperparameters
-["n_gradients", "errors_per_gradient", "gradients_per_error", "steps_per_gradient", "mc_samples_per_step", "max_expansion_factor"]
-- Combo 0: [4, 4, 1, 1, 2, 8], from the paper
-- Combo 1: [4, 4, 3, 2, 0, 6] (referred to as '44320-6' hereafter)
-- Combo 2: [4, 4, 3, 1, 0, 6]
-- Combo 3: [4, 4, 3, 1, 1, 6]
-- Combo 4: [4, 4, 3, 1, 2, 6]
-- Combo 5: [6, 4, 3, 2, 0, 6]
-- Combo 6: [6, 4, 3, 2, 0, 8]
-- Combo 7: [6, 4, 3, 2, 0, 8]
-- Combo 8: [6, 6, 1, 1, 2, 6]
+Parameters: ["n_gradients", "errors_per_gradient", "gradients_per_error", "steps_per_gradient", "mc_samples_per_step", "max_expansion_factor"]
+
+| Combo ID | Configuration | Description |
+|:---:|:---:|:---:|
+| 0 | [4, 4, 1, 1, 2, 8] | Original paper configuration |
+| 1 | [4, 4, 3, 2, 0, 6] | Referred to as '44320-6' |
+| 2 | [4, 4, 3, 1, 0, 6] | - |
+| 3 | [4, 4, 3, 1, 1, 6] | - |
+| 4 | [4, 4, 3, 1, 2, 6] | - |
+| 5 | [6, 4, 3, 2, 0, 6] | - |
+| 6 | [6, 4, 3, 2, 0, 8] | - |
+| 7 | [6, 4, 3, 2, 0, 8] | - |
+| 8 | [6, 6, 1, 1, 2, 6] | - |
 
 #### Evaluation Parameters
-- "evaluator": ["bf", "ucb"]
-- ["eval_rounds", "eval_prompts_per_round", "samples_per_eval"]
-  - Combo 0: [8, 8, 32], "eval_budget": 2048, from the paper
-  - Combo 1: [5, 3, 4], "eval_budget": 60
-  - Combo 1: [5, 3, 8], "eval_budget": 120
-  - Combo 2: [5, 6, 8], "eval_budget": 240
-  - Combo 3: [5, 8, 16], "eval_budget": 640
-  - Combo 4: [10, 5, 16], "eval_budget": 800
+- Evaluators: ["bf", "ucb"]
+- Configurations:
+  - Combo 0: [8, 8, 32], eval_budget: 2048 (paper default)
+  - Combo 1: [5, 3, 4], eval_budget: 60
+  - Combo 2: [5, 3, 8], eval_budget: 120
+  - Combo 3: [5, 6, 8], eval_budget: 240
+  - Combo 4: [5, 8, 16], eval_budget: 640
+  - Combo 5: [10, 5, 16], eval_budget: 800
 
-## Results
+## Results and Analysis
 
-*Note: All tables in this section use a smaller font size for better readability and space efficiency.*
+### Evaluation Budget Impact
+The paper has shown that most of the algorithms improved as the budget increases. The evaluation budget is calculated as:
+```
+eval_budget = samples_per_eval × eval_rounds × eval_prompts_per_round
+```
 
 ### Reflection on Eval_budget
-Due to cost control, I started with GPT 4.1-nano and experimented on eval budget as the paper has shown that most of the algorithms improved as the budget increases.
+To manage costs, I initially used GPT 4.1-nano. Since eval_budget is determined by three hyperparameters, I selected the 'bf' evaluator over 'ucb' evaluator to isolate the impact of eval_budget on test performance (F1). This choice ensured that eval_budget was the sole parameter in selection step. All reported test F1 scores are derived from majority voting across 5 trials, using maxpooling over the final beam of candidates.
 
-`config['eval_budget'] = config['samples_per_eval'] * config['eval_rounds'] * config['eval_prompts_per_round']`
-
-Given eval_budget is decided by 3 hyperparameters, to get a quick reflection on how eval_budget can influence test performance (F1) for this task, I chose 'bf' evaluator instead of 'ucb' evaluator so that 'eval_budget' alone will be the only parameter for prompt selection. All of the reported test F1 scores are from majority voting on 5 trials, based on maxpooling over the final beam of candidates.
-
-As shown in Table 1, the eval_budget varies from 150 to 800 and the test F1 varies from 0.65-0.7, but there is no significant improvement in test performance (F1) as eval_budget increases. One observation from the experiment is that the F1 score of sampled train data can achieve over 90% performance at around 3 optimization steps, which aligns with the paper that the process can overfit on the train data.
+As shown in Table 1, while the eval_budget ranges from 150 to 800, the test F1 scores remain relatively stable between 0.65 and 0.7, indicating that increasing the evaluation budget does not lead to significant performance improvements. Notably, the sampled training data (`"minibatch_size": 64`) F1 scores can reach over 90% performance around 3 optimization steps, suggesting potential overfitting on the training data, which is consistent with findings in the original paper.
 
 #### Table 1: Impact of Evaluation Budget on Model Performance (GPT 4.1-nano, BF Evaluator)
 
@@ -73,30 +78,27 @@ As shown in Table 1, the eval_budget varies from 150 to 800 and the test F1 vari
 | Prompts for Eval | 30 | 30 | 30 | 40 | 40 |
 | **Test F1 Score** | **0.665** | **0.69** | **0.655** | **0.665** | **0.67** |
 
-Given the best combo of expansion hyperparameters, proved by later experiments, using GPT 4o-mini alone and using UCB Bandits selection with an eval_budget as small as 60 could suffice the process for prompt selection, shown in Table 2 below.
+Given the best combo of expansion hyperparameters, proved by later experiments, using GPT 4o-mini alone and using UCB Bandits selection with an eval_budget as small as **60** could suffice the process for prompt selection, shown in Table 2 below.
 
-#### Table 2: Performance Comparison Across Different Evaluation Budgets (GPT 4o-mini, UCB Evaluator)
-
-| (Eval_budget) | 5 x 3 x 4 (60) | 5 x 3 x 8 (120) | 5 x 6 x 8 (240) | 5 x 8 x 16 (640) |
+#### Table 2: UCB Evaluator Performance (GPT 4o-mini)
+| Eval_budget | 60 | 120 | 240 | 640 |
 |:---:|:---:|:---:|:---:|:---:|
 | Prompts for Eval | 30 | 30 | 30 | 60 |
 | **Test F1 Score** | **0.74** | **0.745** | **0.75/0.735** | **0.73** |
 | Peak Round | 5 | 5 | 4 | 3 |
 
-### Combinations on Prompt Expansion
-Table 3 and Table 4 show combinations of hyperparameters during the prompt expansion step. Before filtering candidates from the expansion step, the total number of prompts, after getting gradients and synonyms, is decided by 5 hyperparameters. For example, '44112-8' indicates the 5 hyperparameters by '44112' and '8' after the dash line is the filtering hyperparameter for speeding up the process. Both tables have shown that combo '44320-6' is by far the best combo for achieving a 75% test performance with relatively small costs (API calls). Here, UCB Bandits does not show significant advantage as the eval_budget is relatively small. Also, generating more gradients seems more efficient than getting prompt synonyms in explorating high-quality candidates.
+### Expansion Hyperparameter Analysis
+Table 3 and Table 4 present several combinations of hyperparameters used in the prompt expansion process. The total number of generated prompts (before filtering) is determined by 5 key hyperparameters. For instance, in the notation '44112-8', '44112' represents these 5 hyperparameters, while '8' after the dash indicates the filtering hyperparameter used to speed up processing. Both tables demonstrate that the combination '44320-6' consistently outperforms others, achieving a **75%** test performance while maintaining relatively low computational costs (API calls). In this context, UCB Bandits shows limited advantage due to the small evaluation budget. Additionally, the results suggest that generating more gradient variations is more effective than creating prompt synonyms for discovering high-quality candidates.
 
-#### Table 3: Performance Analysis of Different Expansion Combinations (BF Evaluator, GPT4o-mini, Eval Budget: 240)
-
-| Expansion Combo | 44112-8(paper) | 44310-6 | 44311-6 | 44320-6 | 64320-6 | 66112-6 |
+#### Table 3: BF Evaluator Results (GPT4o-mini, Eval Budget: 240)
+| Expansion Combo | 44112-8 | 44310-6 | 44311-6 | 44320-6 | 64320-6 | 66112-6 |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **Test F1 Score** | **0.715** | **0.72** | **0.73** | **0.76/0.74** | **0.75** | **0.725** |
 | Peak Round | 4 | 3 | 4 | 6 | 4 | 4 |
 | Total API calls | 4+1+4+5(14) | 4+1+12(17) | 4+1+12+13(30) | 4+1+12(17) | 6+1+18(25) | 6+1+6+7(20) |
 | Count of New Prompts | 14 | 12 | 25 | 24 | 36 | 20 |
 
-#### Table 4: Performance Analysis of Different Expansion Combinations (UCB Evaluator, GPT4o-mini, Eval Budget: 240)
-
+#### Table 4: UCB Evaluator Results (GPT4o-mini, Eval Budget: 240)
 | Expansion Combo | 44312-6 | 44610-6 | 48520-6 | 44320-6 | 64320-8 | 66112-6 |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **Test F1 Score** | **0.73** | **0.745** | **0.725** | **0.75/0.735** | **0.725** | **0.735** |
@@ -105,19 +107,25 @@ Table 3 and Table 4 show combinations of hyperparameters during the prompt expan
 | Count of New Prompts | 38 | 24 | 40 | 24 | 36 | 20 |
 
 ### Learning Curve (GPT 4o-min VS GPT 4.1-nano)
-Hybrid model: utilize GPT-4o-mini for the reasoning part, including generating gradients and getting prompt synonyms, and utilize GPT 4.1-nano for scoring and evaluating prompts, which are F1 based.
+#### Hybrid Model Definition
+- GPT-4o-mini: Reasoning tasks (gradients, prompt synonyms)
+- GPT 4.1-nano: Scoring and evaluation (F1-based)
 
-Fig1 and Fig2 both show that GPT-4o-mini alone can improve test performance by around 7% as compared to GPT-4.1-nano alone. The performance of a Hybrid model could be better or worse than GPT-4.1-nano alone, which varies by the combinations of hyperparameters in the expansion step.
+### Model Comparison: GPT 4o-mini vs GPT 4.1-nano vs Hybrid
 
+Performance Comparison:
+- GPT-4o-mini shows ~7% improvement over GPT-4.1-nano
+- Hybrid model performance varies with expansion hyperparameters
+
+[Figures 1 and 2 show detailed performance comparisons]
 <div align="center">
-<img src="AI-Metareviewer/prompt_optimization/results/graphs/f1_scores_plot-eval-240-1.png" width="600" alt="Fig 1: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-66112-6">
+<img src="AI-Metareviewer/prompt_optimization/results/graphs/f1_scores_plot-eval-240.png" width="600" alt="Fig 1: Test F1 on 4o-mini, 4.1-nano and 
+Hybrid model - Expansion Combo-44320-6">
 </div>
-
 <div align="center">
-<img src="AI-Metareviewer/prompt_optimization/results/graphs/f1_scores_plot-eval-240.png" width="600" alt="Fig 2: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-44320-6">
+<img src="AI-Metareviewer/prompt_optimization/results/graphs/f1_scores_plot-eval-240-1.png" width="600" alt="Fig 2: Test F1 on 4o-mini, 4.1-nano and 
+Hybrid model - Expansion Combo-66112-6">
 </div>
-
-### Exploration Parameter c in UCB Bandits
 
 #### Table 5: Impact of UCB Exploration Parameter on Model Performance (GPT 4o-mini, Eval Budget: 60)
 
@@ -127,9 +135,9 @@ Fig1 and Fig2 both show that GPT-4o-mini alone can improve test performance by a
 | Peak Round | 5 | 4 |
 
 ### Observations
-- Gradient Prompt can be optimized and achieve better performance but has more instability. For example, if the variable *num_feedbacks = 1,* **Prompt 01** will randomly return more than 1 feedback during the run while **Ori Prompt** from paper can return the exact number of feedback whereas the input value of *num_feedbacks.*
+- Original prompt maintains consistent feedback count while Modified prompt shows improved performance but increased instability. For example, Modified prompt may return variable feedback counts if the variable *num_feedbacks = 1,*
 
-#### Ori Prompt (from paper):
+#### Original Prompt (Paper)
 ```
 I'm trying to write a zero-shot classifier prompt.
 
@@ -143,7 +151,7 @@ give {num_feedbacks} reasons why the prompt could have gotten these examples wro
 Wrap each reason with <START> and <END>
 ```
 
-#### Prompt 01:
+#### Modified Prompt 01
 ```
 I'm trying to write a zero-shot classifier prompt.
 
@@ -153,17 +161,16 @@ My current prompt is:
 But this prompt gets the following examples wrong:
 {error_string}
 
-give {num_feedbacks} different reasons why the prompt incorrectly classified these examples.
+<span style="color: red">give {num_feedbacks} different reasons why the prompt incorrectly classified these examples.</span>
 Wrap each reason with <START> and <END>
 ```
 
-#### Table 6: Comparative Analysis of Gradient Prompt Performance Across Different Configurations
-
-| Test F1/ Peak Step | Expansion Combo | |
+#### Table 6: Gradient Prompt Performance Comparison
+| Test F1/ Peak Step | Original (44112-8) | Modified (44320-6) |
 |:---:|:---:|:---:|
-| Gradient prompt | 44112 - 8 (from paper) | 44320 - 6 |
-| Ori | **0.71** / R6 | **0.685** / R5 |
-| 01 | **0.715** / R4 | **0.75** / R6 |
+| Original Prompt | 0.71 / R6 | 0.685 / R5 |
+| Modified Prompt | 0.715 / R4 | 0.75 / R6 |
+
 
     
 
