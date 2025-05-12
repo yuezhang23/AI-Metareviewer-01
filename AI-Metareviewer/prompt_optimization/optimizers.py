@@ -66,7 +66,7 @@ class ProTeGi(PromptOptimizer):
         But this prompt gets the following examples wrong:
         {error_string}
 
-        give {num_feedbacks} different reasons why the prompt incorrectly classified these examples.
+        give {num_feedbacks} reasons why the prompt could have gotten these examples wrong.
         Wrap each reason with <START> and <END>
         """
         gradient_prompt = '\n'.join([line.lstrip() for line in gradient_prompt.split('\n')])
@@ -88,9 +88,7 @@ class ProTeGi(PromptOptimizer):
         But it gets the following examples wrong:
         {error_str}
 
-        Based on these examples the problem with this prompt is that {feedback_str}
-
-        Summarize the above information and write {steps_per_gradient} different improved prompts.
+        Based on the above information, I wrote {steps_per_gradient} different improved prompts.
         Each prompt is wrapped with <START> and <END>.
 
         The {steps_per_gradient} new prompts are:

@@ -52,14 +52,14 @@ def plot_f1_scores(results):
     
     plt.xlabel('Round')
     plt.ylabel('F1 Score')
-    plt.title('Test F1 Scores - UCB vs BF')
+    plt.title('Test F1 Scores - GPT-4o-mini VS GPT-4.1-nano')
     plt.grid(True)
-    plt.xlim(0, 17)
+    plt.xlim(1, 6)
     plt.xticks(rounds)  # Using rounds from the last file (they should be the same)
-    plt.ylim(0.58, 0.75)  # Set y-axis limits based on observed F1 scores
+    plt.ylim(0.5, 0.8)  # Set y-axis limits based on observed F1 scores
     plt.legend()
     
-    plt.savefig('results/graphs/f1_scores_plot-eval-400.png')
+    plt.savefig('results/graphs/f1_scores_plot-eval-240-1.png')
     plt.close()
 
 if __name__ == "__main__":
