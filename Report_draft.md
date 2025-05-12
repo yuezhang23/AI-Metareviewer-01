@@ -1,4 +1,5 @@
-# Task: Utilizing LLMs as Academic Chairs for Top ML Conferences
+# Task
+Utilizing LLMs as Academic Chairs for Top ML Conferences
 
 ## Background 
 This study focuses on optimizing nonparametric algorithms for academic paper review decisions. The original ProTeGi algorithm was implemented without hyperparameter optimization. This work explores various hyperparameter combinations to enhance generalization performance, building upon previous human prompting results.
