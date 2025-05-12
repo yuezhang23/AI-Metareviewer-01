@@ -111,6 +111,7 @@ Table 3 and Table 4 present several combinations of hyperparameters used in the 
 | Count of New Prompts | 38 | 24 | 40 | 24 | 36 | 20 |
 
 #### Learning Curve (GPT 4o-min VS GPT 4.1-nano)
+
 ##### Hybrid Model Definition
 - GPT-4o-mini: Reasoning tasks (gradients, prompt synonyms)
 - GPT 4.1-nano: Scoring and evaluation (F1-based)
@@ -119,7 +120,7 @@ Table 3 and Table 4 present several combinations of hyperparameters used in the 
 
 Performance Comparison:
 - GPT-4o-mini shows 5~7% improvement over both GPT-4.1-nano and Hybrid
-- Hybrid model performance varies with expansion hyperparameters
+- Hybrid model performance varies with expansion hyperparameters, compared to GPT-4.1-nano
 
 [Figures 1 and 2 show detailed performance comparisons]
 <div align="center">
