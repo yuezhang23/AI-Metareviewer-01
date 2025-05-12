@@ -1,26 +1,26 @@
-**Task**  
+# Task  
 Utilize LLMs to be an Academic Chair for top ML conferences.  
 
-**Background**  
+# Background  
 As the focus of the paper is nonparametric algorithms with broad applicability, there was no hyperparameter search for the proposed ProTeGi algorithm. For this specific task, I experimented on a list of combinations of hyperparameters for the algorithm in order to achieve higher generalization performance. Prior work includes some human prompting results, shown below.   
----
 
+---
 Biased Prompt : 
 
-* *'''Analyze the reviews provided, decide if the paper in question would be accepted at an academic conference. The vast majority of papers are accepted. About 0.05 of papers are rejected at the conference. Answer only ACCEPT or REJECT'''*
+* `Analyze the reviews provided, decide if the paper in question would be accepted at an academic conference. The vast majority of papers are accepted. About 0.05 of papers are rejected at the conference. Answer only ACCEPT or REJECT `
 
 Test F1 score : 0.75
 
 Neutral Prompts ( Initial prompt sections for APO): 
 
-* *Opt 1: Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference.*  
-* *Opt 2:  Given the following reviews, determine if the paper being reviewed would be accepted at an academic conference.*
+* `Opt 1: Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference.`
+* `Opt 2:  Given the following reviews, determine if the paper being reviewed would be accepted at an academic conference.`
 
 Opt 1 \- Test F1 score : 0.5  
 Opt 2 \- Test F1 score : 0.5  
 ---
 
-**Settings**  
+# Settings 
 Below is a list of settings that are unique or changed to this task.  
 ---
 
@@ -90,11 +90,11 @@ Table 3 and Table 4 show combinations of hyperparameters during the prompt expan
 
 Table 3  Exp03 \- "evaluator": "bf" , "model":  GPT4o-mini, "eval\_budget": 240
 
-| Expansion Combo | 44112-8(paper) | 44310-6 | 44311-6 | 44320-6 | 64320-6 | 66112-6 |
+| Expansion Combo | 44112-8(paper) | 44310-6 | 44311-6 | 44320-6 | 64320-6 | 66112-6 |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | Test F1 Score  | 0.715 | 0.72 | 0.73 | 0.76/0.74 | 0.75 | 0.725 |
 | Peak Round | 4 | 3 | 4 | 6 | 4 | 4 |
-| Total API calls | 4+1+4+5(14) | 4+1+12 (17) | 4+1+12+13(30) | 4+1+12(17) | 6+1+18(25) | 6+1+6+7(20) |
+| Total API calls | 4+1+4+5 (14) | 4+1+12 (17) | 4+1+12+13(30) | 4+1+12(17) | 6+1+18(25) | 6+1+6+7(20) |
 | Count of New Prompts | 14 | 12 | 25 | 24 | 36 | 20 |
 
 Table 4   Exp04 \-  "evaluator": "ucb" , "model":  GPT4o-mini, "eval\_budget": 240
@@ -103,7 +103,7 @@ Table 4   Exp04 \-  "evaluator": "ucb" , "model":  GPT4o-mini, "eval\_budget": 2
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | Test F1 Score  | 0.73 | 0.745 | 0.725 | 0.75/0.735 | 0.725 | 0.735 |
 | Peak Round | 3 | 5 | 5 | 4 | 4 | 4 |
-| Total API calls | 4+1+12+13(30) | 4+1+24(29) | 4+1+20(25) | 4+1+12(17) | 6+1+18(25) | 6+1+6+7(20) |
+| Total API calls | 4+1+12+13(30) | 4+1+24(29) | 4+1+20(25) | 4+1+12(17) | 6+1+18(25) | 6+1+6+7(20) |
 | Count of New Prompts  | 38 | 24 | 40 | 24 | 36 | 20 |
 
 * **Learning Curve (GPT 4o-min VS GPT 4.1-nano)**  
