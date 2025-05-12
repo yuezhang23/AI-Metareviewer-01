@@ -118,7 +118,7 @@ Table 3 and Table 4 present several combinations of hyperparameters used in the 
 ##### Model Comparison: GPT 4o-mini vs GPT 4.1-nano vs Hybrid
 
 Performance Comparison:
-- GPT-4o-mini shows ~7% improvement over GPT-4.1-nano
+- GPT-4o-mini shows 5~7% improvement over both GPT-4.1-nano and Hybrid
 - Hybrid model performance varies with expansion hyperparameters
 
 [Figures 1 and 2 show detailed performance comparisons]
@@ -166,7 +166,7 @@ My current prompt is:
 But this prompt gets the following examples wrong:
 {error_string}
 
-<span style="color: red">give {num_feedbacks} different reasons why the prompt incorrectly classified these examples.</span>
+give {num_feedbacks} different reasons why the prompt incorrectly classified these examples.
 Wrap each reason with <START> and <END>
 ```
 
