@@ -6,15 +6,18 @@ This study focuses on optimizing nonparametric algorithms for academic paper rev
 
 ### Previous Results
 #### Biased Prompt 
-- Prompt: `Analyze the reviews provided, decide if the paper in question would be accepted at an academic conference. The vast majority of papers are accepted. About 0.05 of papers are rejected at the conference. Answer only ACCEPT or REJECT`
+- Prompt: 
+`Analyze the reviews provided, decide if the paper in question would be accepted at an academic conference. The vast majority of papers are accepted. About 0.05 of papers are rejected at the conference. Answer only ACCEPT or REJECT`
 - Performance: Test F1 - 4o-mini: 0.75
 
 #### Neutral Prompts
-- Option 1: `Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference.`
+- Option 1: 
+`Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference.`
    - Test F1 - 4o-mini: 0.692
    - Test F1 - 4.1-nano: 0.55
 
-- Option 2: `Given the following reviews, determine if the paper being reviewed would be accepted at an academic conference.`
+- Option 2: 
+`Given the following reviews, determine if the paper being reviewed would be accepted at an academic conference.`
    - Test F1 - 4o-mini: 0.65
    - Test F1 - 4.1-nano: 0.525
 
