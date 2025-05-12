@@ -4,17 +4,17 @@ Utilize LLMs to be an Academic Chair for top ML conferences.
 ## Background
 As the focus of the paper is nonparametric algorithms with broad applicability, there was no hyperparameter search for the proposed ProTeGi algorithm. For this specific task, I experimented on a list of combinations of hyperparameters for the algorithm in order to achieve higher generalization performance. Prior work includes some human prompting results, shown below.
 
-Biased Prompt
+- Biased Prompt
 `Analyze the reviews provided, decide if the paper in question would be accepted at an academic conference. The vast majority of papers are accepted. About 0.05 of papers are rejected at the conference. Answer only ACCEPT or REJECT`
 
-Test F1 score: 0.75
+- - Test F1 score: 0.75
 
-Neutral Prompts (Initial prompt sections for APO)
+- Neutral Prompts (Initial prompt sections for APO)
 Opt 1: `Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference.`
-   - Test F1 score: 0.5
+   - - Test F1 score: 0.5
 
 Opt 2: `Given the following reviews, determine if the paper being reviewed would be accepted at an academic conference.`
-   - Test F1 score: 0.5
+   - - Test F1 score: 0.5
 
 ## Settings
 Below is a list of settings that are unique or changed to this task.
@@ -108,9 +108,9 @@ Hybrid model: utilize GPT-4o-mini for the reasoning part, including generating g
 
 Fig1 and Fig2 both show that GPT-4o-mini alone can improve test performance by around 7% as compared to GPT-4.1-nano alone. The performance of a Hybrid model could be better or worse than GPT-4.1-nano alone, which varies by the combinations of hyperparameters in the expansion step.
 
-![Fig 1: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-66112-6](/AI-Metareviewer/prompt_optimization/results/graphs/f1_scores_plot-eval-240-1.png.png)
+![Fig 1: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-66112-6](prompt_optimization/results/graphs/f1_scores_plot-eval-240-1.png.png)
 
-![Fig 2: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-44320-6](/AI-Metareviewer/prompt_optimization/results/graphs/f1_scores_plot-eval-240.png.png)
+![Fig 2: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-44320-6](prompt_optimization/results/graphs/f1_scores_plot-eval-240.png.png)
 
 ### Exploration Parameter c in UCB Bandits
 
