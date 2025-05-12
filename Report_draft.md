@@ -2,7 +2,7 @@
 Utilizing LLMs as Academic Chairs for Top ML Conferences
 
 ## Background 
-This study focuses on optimizing nonparametric algorithms for academic paper review decisions. The original ProTeGi algorithm was implemented without hyperparameter optimization. This work explores various hyperparameter combinations to enhance generalization performance, building upon previous human prompting results.
+This study focuses on optimizing nonparametric algorithms for academic paper review decisions. The original ProTeGi algorithm from the paper was implemented without hyperparameter optimization. This work explores various hyperparameter combinations to enhance generalization performance, building upon previous human prompting results.
 
 ### Previous Results
 #### Biased Prompt 
@@ -10,7 +10,7 @@ This study focuses on optimizing nonparametric algorithms for academic paper rev
 `Analyze the reviews provided, decide if the paper in question would be accepted at an academic conference. The vast majority of papers are accepted. About 0.05 of papers are rejected at the conference. Answer only ACCEPT or REJECT`
 - Performance: Test F1 - 4o-mini: 0.75
 
-#### Neutral Prompts
+#### Neutral Prompts (used as `Task` section in prompt template)
 - Option 1: 
 `Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference.`
    - Test F1 - 4o-mini: 0.692
@@ -71,9 +71,9 @@ The paper has shown that most of the algorithms improved as the budget increases
 config['eval_budget'] = config['samples_per_eval'] * config['eval_rounds'] * config['eval_prompts_per_round']
 ```
 
-To manage costs, I initially used GPT 4.1-nano. Since eval_budget is determined by three hyperparameters, I selected the 'bf' evaluator over 'ucb' evaluator to isolate the impact of eval_budget on test performance (F1). This choice ensured that eval_budget was the sole parameter in selection step. All reported test F1 scores are derived from majority voting across 5 trials, using maxpooling over the beams of candidates starting from the 3rd optimization step.
+To manage costs, I initially used GPT 4.1-nano. Since eval_budget is determined by three hyperparameters, I selected the 'bf' evaluator over 'ucb' evaluator to isolate the impact of eval_budget on test performance (F1). This choice ensured that eval_budget was the sole parameter in prompt election step. All reported test F1 scores are derived from majority voting across 5 trials, using maxpooling over the beams of candidates starting from the 3rd optimization step.
 
-As shown in Table 1, while the eval_budget ranges from 150 to 800, the test F1 scores remain relatively stable between 0.65 and 0.7, indicating that increasing the evaluation budget does not lead to significant performance improvements. Notably, the sampled training data (`"minibatch_size": 64`) F1 scores can reach over 90% performance around 3 optimization steps, suggesting potential overfitting on the training data, which is consistent with findings in the original paper.
+As shown in Table 1, while the eval_budget ranges from 150 to 800, the test F1 scores remain relatively stable between 0.65 and 0.7 (GPT 4.1-nano), indicating that increasing the evaluation budget does not lead to significant performance improvements. Notably, the sampled training data (`"minibatch_size": 64`) F1 scores can reach over 90% performance around 3 optimization steps, suggesting potential overfitting on the training data, which is consistent with findings in the original paper.
 
 ##### Table 1: BF Evaluator Performance (GPT 4.1-nano)
 
@@ -82,7 +82,7 @@ As shown in Table 1, while the eval_budget ranges from 150 to 800, the test F1 s
 | Prompts for Eval | 30 | 30 | 30 | 40 | 40 |
 | **Test F1 Score** | **0.665** | **0.69** | **0.655** | **0.665** | **0.67** |
 
-Given the best combo of expansion hyperparameters, proved by later experiments, using GPT 4o-mini alone and using UCB Bandits selection with an eval_budget as small as **60** could suffice the process for prompt selection, shown in Table 2 below.
+Given the best combo of expansion hyperparameters, proved by later experiments, using GPT 4o-mini alone and using UCB Bandits selection with an eval_budget as small as **60** could suffice the process for prompt selection, with test F1 scores between 0.73 and 0.75 (GPT 4o-mini), shown in Table 2 below.
 
 ##### Table 2: UCB Evaluator Performance (GPT 4o-mini)
 | Eval_budget | 60 | 120 | 240 | 640 |
@@ -92,7 +92,7 @@ Given the best combo of expansion hyperparameters, proved by later experiments, 
 | Peak Round | 5 | 5 | 4 | 3 |
 
 #### Expansion Hyperparameter Analysis
-Table 3 and Table 4 present several combinations of hyperparameters used in the prompt expansion process. The total number of generated prompts (before filtering) is determined by 5 key hyperparameters. For instance, in the notation '44112-8', '44112' represents these 5 hyperparameters, while '8' after the dash indicates the filtering hyperparameter used to speed up processing. Both tables demonstrate that the combination '44320-6' consistently outperforms others, achieving a **75%** test performance while maintaining relatively low computational costs (API calls). In this context, UCB Bandits shows limited advantage due to the small evaluation budget. Additionally, the results suggest that generating more gradient variations is more effective than creating prompt synonyms for discovering high-quality candidates.
+Table 3 and Table 4 present several combinations of hyperparameters used in the prompt expansion process. The total number of generated prompts (before filtering) is determined by 5 key hyperparameters. Both tables demonstrate that the combination '44320-6' consistently outperforms others, achieving a **75%** test performance while maintaining relatively low computational costs (API calls). In this context, UCB Bandits shows limited advantage due to the small evaluation budget. Additionally, the results suggest that generating more gradient variations is more effective than creating prompt synonyms for discovering high-quality candidates.
 
 ##### Table 3: BF Evaluator Results (GPT4o-mini, Eval Budget: 240)
 | Expansion Combo | 44112-8 | 44310-6 | 44311-6 | 44320-6 | 64320-6 | 66112-6 |
