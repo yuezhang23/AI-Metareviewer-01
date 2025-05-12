@@ -140,7 +140,7 @@ Hybrid model - Expansion Combo-66112-6">
 | **Test F1 Score** | **0.74** | **0.725** |
 | Peak Round | 5 | 4 |
 
-#### Observations
+#### Observations on Gradient Prompt
 Original prompt maintains consistent feedback count while Modified prompt shows improved performance but increased instability. For example, Modified prompt may return variable feedback counts if the variable *num_feedbacks = 1,*
 
 ##### Original Prompt (Paper)
