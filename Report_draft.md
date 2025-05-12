@@ -55,6 +55,8 @@ Below is a list of settings that are unique or changed to this task.
 
 ## Results
 
+*Note: All tables in this section use a smaller font size for better readability and space efficiency.*
+
 ### Reflection on Eval_budget
 Due to cost control, I started with GPT 4.1-nano and experimented on eval budget as the paper has shown that most of the algorithms improved as the budget increases.
 
@@ -64,7 +66,7 @@ Given eval_budget is decided by 3 hyperparameters, to get a quick reflection on 
 
 As shown in Table 1, the eval_budget varies from 150 to 800 and the test F1 varies from 0.65-0.7, but there is no significant improvement in test performance (F1) as eval_budget increases. One observation from the experiment is that the F1 score of sampled train data can achieve over 90% performance at around 3 optimization steps, which aligns with the paper that the process can overfit on the train data.
 
-#### Table 1: Exp 01 - evaluator - "bf", model - GPT 4.1-nano
+#### Table 1: Impact of Evaluation Budget on Model Performance (GPT 4.1-nano, BF Evaluator)
 
 | Eval_budget | 150 | 240 | 360 | 600 | 800 |
 |:---:|:---:|:---:|:---:|:---:|:---:|
@@ -73,7 +75,7 @@ As shown in Table 1, the eval_budget varies from 150 to 800 and the test F1 vari
 
 Given the best combo of expansion hyperparameters, proved by later experiments, using GPT 4o-mini alone and using UCB Bandits selection with an eval_budget as small as 60 could suffice the process for prompt selection, shown in Table 2 below.
 
-#### Table 2: Exp 02 - evaluator - "ucb", model - GPT 4o-mini
+#### Table 2: Performance Comparison Across Different Evaluation Budgets (GPT 4o-mini, UCB Evaluator)
 
 | (Eval_budget) | 5 x 3 x 4 (60) | 5 x 3 x 8 (120) | 5 x 6 x 8 (240) | 5 x 8 x 16 (640) |
 |:---:|:---:|:---:|:---:|:---:|
@@ -84,7 +86,7 @@ Given the best combo of expansion hyperparameters, proved by later experiments, 
 ### Combinations on Prompt Expansion
 Table 3 and Table 4 show combinations of hyperparameters during the prompt expansion step. Before filtering candidates from the expansion step, the total number of prompts, after getting gradients and synonyms, is decided by 5 hyperparameters. For example, '44112-8' indicates the 5 hyperparameters by '44112' and '8' after the dash line is the filtering hyperparameter for speeding up the process. Both tables have shown that combo '44320-6' is by far the best combo for achieving a 75% test performance with relatively small costs (API calls). Here, UCB Bandits does not show significant advantage as the eval_budget is relatively small. Also, generating more gradients seems more efficient than getting prompt synonyms in explorating high-quality candidates.
 
-#### Table 3: Exp03 - "evaluator": "bf", "model": GPT4o-mini, "eval_budget": 240
+#### Table 3: Performance Analysis of Different Expansion Combinations (BF Evaluator, GPT4o-mini, Eval Budget: 240)
 
 | Expansion Combo | 44112-8(paper) | 44310-6 | 44311-6 | 44320-6 | 64320-6 | 66112-6 |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -93,7 +95,7 @@ Table 3 and Table 4 show combinations of hyperparameters during the prompt expan
 | Total API calls | 4+1+4+5(14) | 4+1+12(17) | 4+1+12+13(30) | 4+1+12(17) | 6+1+18(25) | 6+1+6+7(20) |
 | Count of New Prompts | 14 | 12 | 25 | 24 | 36 | 20 |
 
-#### Table 4: Exp04 - "evaluator": "ucb", "model": GPT4o-mini, "eval_budget": 240
+#### Table 4: Performance Analysis of Different Expansion Combinations (UCB Evaluator, GPT4o-mini, Eval Budget: 240)
 
 | Expansion Combo | 44312-6 | 44610-6 | 48520-6 | 44320-6 | 64320-8 | 66112-6 |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -107,13 +109,13 @@ Hybrid model: utilize GPT-4o-mini for the reasoning part, including generating g
 
 Fig1 and Fig2 both show that GPT-4o-mini alone can improve test performance by around 7% as compared to GPT-4.1-nano alone. The performance of a Hybrid model could be better or worse than GPT-4.1-nano alone, which varies by the combinations of hyperparameters in the expansion step.
 
-![Fig 1: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-66112-6](prompt_optimization/results/graphs/f1_scores_plot-eval-240-1.png)
+![Fig 1: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-66112-6](AI-Metareviewer/prompt_optimization/results/graphs/f1_scores_plot-eval-240-1.png)
 
-![Fig 2: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-44320-6](prompt_optimization/results/graphs/f1_scores_plot-eval-240.png)
+![Fig 2: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-44320-6](AI-Metareviewer/prompt_optimization/results/graphs/f1_scores_plot-eval-240.png)
 
 ### Exploration Parameter c in UCB Bandits
 
-#### Table 5: Comparison of c2.0 vs c1.0 - eval_budget-60
+#### Table 5: Impact of UCB Exploration Parameter on Model Performance (GPT 4o-mini, Eval Budget: 60)
 
 | UCB-44320-6 (4o-mini) | 5 x 3 x 4 - c2.0 | 5 x 3 x 4 - c1.0 |
 |:---:|:---:|:---:|
@@ -151,7 +153,7 @@ give {num_feedbacks} different reasons why the prompt incorrectly classified the
 Wrap each reason with <START> and <END>
 ```
 
-#### Table 6: Comparison of Test F1/ Peak Step for Gradient prompts
+#### Table 6: Comparative Analysis of Gradient Prompt Performance Across Different Configurations
 
 | Test F1/ Peak Step | Expansion Combo | |
 |:---:|:---:|:---:|
