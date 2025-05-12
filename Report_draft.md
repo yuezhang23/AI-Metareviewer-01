@@ -12,12 +12,12 @@ This study focuses on optimizing nonparametric algorithms for academic paper rev
 
 #### Neutral Prompts 
 - Inital Prompt for this task: 
-`Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference.`
+- `Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference.`
    - Test F1 - 4o-mini: 0.692
    - Test F1 - 4.1-nano: 0.55
 
 - Optional: 
-`Given the following reviews, determine if the paper being reviewed would be accepted at an academic conference.`
+- `Given the following reviews, determine if the paper being reviewed would be accepted at an academic conference.`
    - Test F1 - 4o-mini: 0.65
    - Test F1 - 4.1-nano: 0.525
 
