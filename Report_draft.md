@@ -41,7 +41,10 @@ This study focuses on optimizing nonparametric algorithms for academic paper rev
 Parameters: 
 - ["n_gradients", "errors_per_gradient", "gradients_per_error", "steps_per_gradient", "mc_samples_per_step", "max_expansion_factor"]
 
-| Combo ID | Configuration | Description |
+- Combos
+[[4, 4, 1, 1, 2, 8], [4, 4, 3, 2, 0, 6], [4, 4, 3, 1, 0, 6], [4, 4, 3, 1, 1, 6], [4, 4, 3, 1, 2, 6], [6, 4, 3, 2, 0, 6], [6, 4, 3, 2, 0, 8], [6, 4, 3, 2, 0, 8], [6, 6, 1, 1, 2, 6]]
+
+<!-- | Combo ID | Configuration | Description |
 |:---:|:---:|:---:|
 | 0 | [4, 4, 1, 1, 2, 8] | paper default |
 | 1 | [4, 4, 3, 2, 0, 6] | Referred to as '44320-6' |
@@ -51,7 +54,7 @@ Parameters:
 | 5 | [6, 4, 3, 2, 0, 6] | Referred to as '64320-6' |
 | 6 | [6, 4, 3, 2, 0, 8] | Referred to as '64320-8' |
 | 7 | [6, 4, 3, 2, 0, 8] | Referred to as '64320-8' |
-| 8 | [6, 6, 1, 1, 2, 6] | Referred to as '66112-6' |
+| 8 | [6, 6, 1, 1, 2, 6] | Referred to as '66112-6' | -->
 
 #### Evaluation Parameters
 - Evaluators: ["bf", "ucb"]
