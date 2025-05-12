@@ -172,7 +172,7 @@ Wrap each reason with <START> and <END>
 ```
 
 ##### Table 6: Gradient Prompt Performance Comparison
-| Test F1/ Peak Step | Original (44112-8) | Modified (44320-6) |
+| Test F1/ Peak Step |  44112-8 | 44320-6 |
 |:---:|:---:|:---:|
 | Original Prompt | 0.71 / R6 | 0.685 / R5 |
 | Modified Prompt | 0.715 / R4 | 0.75 / R6 |
