@@ -5,15 +5,15 @@ Utilize LLMs to be an Academic Chair for top ML conferences.
 As the focus of the paper is nonparametric algorithms with broad applicability, there was no hyperparameter search for the proposed ProTeGi algorithm. For this specific task, I experimented on a list of combinations of hyperparameters for the algorithm in order to achieve higher generalization performance. Prior work includes some human prompting results, shown below.
 
 ### Biased Prompt
-Analyze the reviews provided, decide if the paper in question would be accepted at an academic conference. The vast majority of papers are accepted. About 0.05 of papers are rejected at the conference. Answer only ACCEPT or REJECT
+`Analyze the reviews provided, decide if the paper in question would be accepted at an academic conference. The vast majority of papers are accepted. About 0.05 of papers are rejected at the conference. Answer only ACCEPT or REJECT`
 
 Test F1 score: 0.75
 
 ### Neutral Prompts (Initial prompt sections for APO)
-1. Opt 1: Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference.
+1. Opt 1: `Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference.`
    - Test F1 score: 0.5
 
-2. Opt 2: Given the following reviews, determine if the paper being reviewed would be accepted at an academic conference.
+2. Opt 2: `Given the following reviews, determine if the paper being reviewed would be accepted at an academic conference.`
    - Test F1 score: 0.5
 
 ## Settings
