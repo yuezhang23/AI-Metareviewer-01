@@ -68,73 +68,63 @@ As shown in Table 1, the eval_budget varies from 150 to 800 and the test F1 vari
 
 #### Table 1: Impact of Evaluation Budget on Model Performance (GPT 4.1-nano, BF Evaluator)
 
-<div style="text-align: center; font-size: 0.9em;">
 | Eval_budget | 150 | 240 | 360 | 600 | 800 |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | Prompts for Eval | 30 | 30 | 30 | 40 | 40 |
 | **Test F1 Score** | **0.665** | **0.69** | **0.655** | **0.665** | **0.67** |
-</div>
 
 Given the best combo of expansion hyperparameters, proved by later experiments, using GPT 4o-mini alone and using UCB Bandits selection with an eval_budget as small as 60 could suffice the process for prompt selection, shown in Table 2 below.
 
 #### Table 2: Performance Comparison Across Different Evaluation Budgets (GPT 4o-mini, UCB Evaluator)
 
-<div style="text-align: center; font-size: 0.9em;">
 | (Eval_budget) | 5 x 3 x 4 (60) | 5 x 3 x 8 (120) | 5 x 6 x 8 (240) | 5 x 8 x 16 (640) |
 |:---:|:---:|:---:|:---:|:---:|
 | Prompts for Eval | 30 | 30 | 30 | 60 |
 | **Test F1 Score** | **0.74** | **0.745** | **0.75/0.735** | **0.73** |
 | Peak Round | 5 | 5 | 4 | 3 |
-</div>
 
 ### Combinations on Prompt Expansion
 Table 3 and Table 4 show combinations of hyperparameters during the prompt expansion step. Before filtering candidates from the expansion step, the total number of prompts, after getting gradients and synonyms, is decided by 5 hyperparameters. For example, '44112-8' indicates the 5 hyperparameters by '44112' and '8' after the dash line is the filtering hyperparameter for speeding up the process. Both tables have shown that combo '44320-6' is by far the best combo for achieving a 75% test performance with relatively small costs (API calls). Here, UCB Bandits does not show significant advantage as the eval_budget is relatively small. Also, generating more gradients seems more efficient than getting prompt synonyms in explorating high-quality candidates.
 
 #### Table 3: Performance Analysis of Different Expansion Combinations (BF Evaluator, GPT4o-mini, Eval Budget: 240)
 
-<div style="text-align: center; font-size: 0.9em;">
 | Expansion Combo | 44112-8(paper) | 44310-6 | 44311-6 | 44320-6 | 64320-6 | 66112-6 |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **Test F1 Score** | **0.715** | **0.72** | **0.73** | **0.76/0.74** | **0.75** | **0.725** |
 | Peak Round | 4 | 3 | 4 | 6 | 4 | 4 |
 | Total API calls | 4+1+4+5(14) | 4+1+12(17) | 4+1+12+13(30) | 4+1+12(17) | 6+1+18(25) | 6+1+6+7(20) |
 | Count of New Prompts | 14 | 12 | 25 | 24 | 36 | 20 |
-</div>
 
 #### Table 4: Performance Analysis of Different Expansion Combinations (UCB Evaluator, GPT4o-mini, Eval Budget: 240)
 
-<div style="text-align: center; font-size: 0.9em;">
 | Expansion Combo | 44312-6 | 44610-6 | 48520-6 | 44320-6 | 64320-8 | 66112-6 |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **Test F1 Score** | **0.73** | **0.745** | **0.725** | **0.75/0.735** | **0.725** | **0.735** |
 | Peak Round | 3 | 5 | 5 | 4 | 4 | 4 |
 | Total API calls | 4+1+12+13(30) | 4+1+24(29) | 4+1+20(25) | 4+1+12(17) | 6+1+18(25) | 6+1+6+7(20) |
 | Count of New Prompts | 38 | 24 | 40 | 24 | 36 | 20 |
-</div>
 
 ### Learning Curve (GPT 4o-min VS GPT 4.1-nano)
 Hybrid model: utilize GPT-4o-mini for the reasoning part, including generating gradients and getting prompt synonyms, and utilize GPT 4.1-nano for scoring and evaluating prompts, which are F1 based.
 
 Fig1 and Fig2 both show that GPT-4o-mini alone can improve test performance by around 7% as compared to GPT-4.1-nano alone. The performance of a Hybrid model could be better or worse than GPT-4.1-nano alone, which varies by the combinations of hyperparameters in the expansion step.
 
-<div style="text-align: center;">
-<img src="AI-Metareviewer/prompt_optimization/results/graphs/f1_scores_plot-eval-240-1.png" alt="Fig 1: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-66112-6" style="width: 80%; max-width: 600px;">
+<div align="center">
+<img src="AI-Metareviewer/prompt_optimization/results/graphs/f1_scores_plot-eval-240-1.png" width="600" alt="Fig 1: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-66112-6">
 </div>
 
-<div style="text-align: center;">
-<img src="AI-Metareviewer/prompt_optimization/results/graphs/f1_scores_plot-eval-240.png" alt="Fig 2: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-44320-6" style="width: 80%; max-width: 600px;">
+<div align="center">
+<img src="AI-Metareviewer/prompt_optimization/results/graphs/f1_scores_plot-eval-240.png" width="600" alt="Fig 2: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-44320-6">
 </div>
 
 ### Exploration Parameter c in UCB Bandits
 
 #### Table 5: Impact of UCB Exploration Parameter on Model Performance (GPT 4o-mini, Eval Budget: 60)
 
-<div style="text-align: center; font-size: 0.9em;">
 | UCB-44320-6 (4o-mini) | 5 x 3 x 4 - c2.0 | 5 x 3 x 4 - c1.0 |
 |:---:|:---:|:---:|
 | **Test F1 Score** | **0.74** | **0.725** |
 | Peak Round | 5 | 4 |
-</div>
 
 ### Observations
 - Gradient Prompt can be optimized and achieve better performance but has more instability. For example, if the variable *num_feedbacks = 1,* **Prompt 01** will randomly return more than 1 feedback during the run while **Ori Prompt** from paper can return the exact number of feedback whereas the input value of *num_feedbacks.*
@@ -169,13 +159,11 @@ Wrap each reason with <START> and <END>
 
 #### Table 6: Comparative Analysis of Gradient Prompt Performance Across Different Configurations
 
-<div style="text-align: center; font-size: 0.9em;">
 | Test F1/ Peak Step | Expansion Combo | |
 |:---:|:---:|:---:|
 | Gradient prompt | 44112 - 8 (from paper) | 44320 - 6 |
 | Ori | **0.71** / R6 | **0.685** / R5 |
 | 01 | **0.715** / R4 | **0.75** / R6 |
-</div>
 
     
 
