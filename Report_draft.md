@@ -41,8 +41,16 @@ This study focuses on optimizing nonparametric algorithms for academic paper rev
 Parameters: 
 - ["n_gradients", "errors_per_gradient", "gradients_per_error", "steps_per_gradient", "mc_samples_per_step", "max_expansion_factor"]
 
-- Combos
-[[4, 4, 1, 1, 2, 8], [4, 4, 3, 2, 0, 6], [4, 4, 3, 1, 0, 6], [4, 4, 3, 1, 1, 6], [4, 4, 3, 1, 2, 6], [6, 4, 3, 2, 0, 6], [6, 4, 3, 2, 0, 8], [6, 4, 3, 2, 0, 8], [6, 6, 1, 1, 2, 6]]
+- Combos: 
+- [4, 4, 1, 1, 2, 8]
+- [4, 4, 3, 2, 0, 6] 
+- [4, 4, 3, 1, 0, 6]
+- [4, 4, 3, 1, 1, 6]
+- [4, 4, 3, 1, 2, 6]
+- [6, 4, 3, 2, 0, 6]
+- [6, 4, 3, 2, 0, 8]
+- [6, 4, 3, 2, 0, 8]
+- [6, 6, 1, 1, 2, 6]
 
 <!-- | Combo ID | Configuration | Description |
 |:---:|:---:|:---:|
