@@ -20,13 +20,12 @@ As the focus of the paper is nonparametric algorithms with broad applicability, 
 Below is a list of settings that are unique or changed to this task.
 
 ### Data
-- Source: venue_id = '[NeurIPS.cc/2024/Conference](http://NeurIPS.cc/2024/Conference)'
+- Source: venue_id = '[NeurIPS.cc/2024/Conference](https://neurips.cc/Conferences/2024)'
 - Training dataset: 800 accept + 800 reject
 - Test dataset: 800 accept + 800 reject
 - Test data: 100 accept + 100 reject
 
-### Setup
-#### Hyperparameters (different from the paper)
+### Setup 
 - "model": ["gpt-4o-mini", "gpt-4.1-nano"]
 - "eval_model": ["gpt-4o-mini", "gpt-4.1-nano"]
 - "beam_size": 5
@@ -70,7 +69,7 @@ As shown in Table 1, the eval_budget varies from 150 to 800 and the test F1 vari
 | Eval_budget | 150 | 240 | 360 | 600 | 800 |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | Prompts for Eval | 30 | 30 | 30 | 40 | 40 |
-| Test F1 Score | 0.665 | 0.69 | 0.655 | 0.665 | 0.67 |
+| **Test F1 Score** | **0.665** | **0.69** | **0.655** | **0.665** | **0.67** |
 
 Given the best combo of expansion hyperparameters, proved by later experiments, using GPT 4o-mini alone and using UCB Bandits selection with an eval_budget as small as 60 could suffice the process for prompt selection, shown in Table 2 below.
 
@@ -79,7 +78,7 @@ Given the best combo of expansion hyperparameters, proved by later experiments, 
 | (Eval_budget) | 5 x 3 x 4 (60) | 5 x 3 x 8 (120) | 5 x 6 x 8 (240) | 5 x 8 x 16 (640) |
 |:---:|:---:|:---:|:---:|:---:|
 | Prompts for Eval | 30 | 30 | 30 | 60 |
-| Test F1 Score | 0.74 | 0.745 | 0.75/0.735 | 0.73 |
+| **Test F1 Score** | **0.74** | **0.745** | **0.75/0.735** | **0.73** |
 | Peak Round | 5 | 5 | 4 | 3 |
 
 ### Combinations on Prompt Expansion
@@ -89,7 +88,7 @@ Table 3 and Table 4 show combinations of hyperparameters during the prompt expan
 
 | Expansion Combo | 44112-8(paper) | 44310-6 | 44311-6 | 44320-6 | 64320-6 | 66112-6 |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Test F1 Score | 0.715 | 0.72 | 0.73 | 0.76/0.74 | 0.75 | 0.725 |
+| **Test F1 Score** | **0.715** | **0.72** | **0.73** | **0.76/0.74** | **0.75** | **0.725** |
 | Peak Round | 4 | 3 | 4 | 6 | 4 | 4 |
 | Total API calls | 4+1+4+5(14) | 4+1+12(17) | 4+1+12+13(30) | 4+1+12(17) | 6+1+18(25) | 6+1+6+7(20) |
 | Count of New Prompts | 14 | 12 | 25 | 24 | 36 | 20 |
@@ -98,7 +97,7 @@ Table 3 and Table 4 show combinations of hyperparameters during the prompt expan
 
 | Expansion Combo | 44312-6 | 44610-6 | 48520-6 | 44320-6 | 64320-8 | 66112-6 |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Test F1 Score | 0.73 | 0.745 | 0.725 | 0.75/0.735 | 0.725 | 0.735 |
+| **Test F1 Score** | **0.73** | **0.745** | **0.725** | **0.75/0.735** | **0.725** | **0.735** |
 | Peak Round | 3 | 5 | 5 | 4 | 4 | 4 |
 | Total API calls | 4+1+12+13(30) | 4+1+24(29) | 4+1+20(25) | 4+1+12(17) | 6+1+18(25) | 6+1+6+7(20) |
 | Count of New Prompts | 38 | 24 | 40 | 24 | 36 | 20 |
@@ -108,9 +107,9 @@ Hybrid model: utilize GPT-4o-mini for the reasoning part, including generating g
 
 Fig1 and Fig2 both show that GPT-4o-mini alone can improve test performance by around 7% as compared to GPT-4.1-nano alone. The performance of a Hybrid model could be better or worse than GPT-4.1-nano alone, which varies by the combinations of hyperparameters in the expansion step.
 
-![Fig 1: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-66112-6](prompt_optimization/results/graphs/f1_scores_plot-eval-240-1.png.png)
+![Fig 1: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-66112-6](prompt_optimization/results/graphs/f1_scores_plot-eval-240-1.png)
 
-![Fig 2: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-44320-6](prompt_optimization/results/graphs/f1_scores_plot-eval-240.png.png)
+![Fig 2: Test F1 on 4o-mini, 4.1-nano and Hybrid model - Expansion Combo-44320-6](prompt_optimization/results/graphs/f1_scores_plot-eval-240.png)
 
 ### Exploration Parameter c in UCB Bandits
 
@@ -118,7 +117,7 @@ Fig1 and Fig2 both show that GPT-4o-mini alone can improve test performance by a
 
 | UCB-44320-6 (4o-mini) | 5 x 3 x 4 - c2.0 | 5 x 3 x 4 - c1.0 |
 |:---:|:---:|:---:|
-| Test F1 Score | 0.74 | 0.725 |
+| **Test F1 Score** | **0.74** | **0.725** |
 | Peak Round | 5 | 4 |
 
 ### Observations
@@ -157,8 +156,8 @@ Wrap each reason with <START> and <END>
 | Test F1/ Peak Step | Expansion Combo | |
 |:---:|:---:|:---:|
 | Gradient prompt | 44112 - 8 (from paper) | 44320 - 6 |
-| Ori | 0.71 / R6 | 0.685 / R5 |
-| 01 | 0.715 / R4 | 0.75 / R6 |
+| Ori | **0.71** / R6 | **0.685** / R5 |
+| 01 | **0.715** / R4 | **0.75** / R6 |
 
     
 
