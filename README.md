@@ -1,6 +1,9 @@
 # Task
 Utilizing LLMs as Academic Chairs for Top ML Conferences
 
+Author: Yue Zhang
+With support from Andrew Bai
+
 ## Background 
 This study focuses on optimizing nonparametric algorithms for academic paper review decisions. The original ProTeGi algorithm from the paper was implemented without hyperparameter optimization. This work explores various hyperparameter combinations to enhance generalization performance, building upon previous human prompting results.
 
