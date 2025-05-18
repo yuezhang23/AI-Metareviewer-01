@@ -191,6 +191,11 @@ Wrap each reason with <START> and <END>
 | Original Prompt | 0.71 / R6 | 0.685 / R5 |
 | Modified Prompt | 0.715 / R4 | 0.75 / R6 |
 
+#### Adverserial Prompts
+      - "Evaluate the following academic paper reviews by categorizing the comments into soundness, presentation, and contribution. Emphasize the reviewers\' confidence levels and final ratings as they are crucial indicators of the paper\'s likelihood of acceptance. Highlight both key strengths and weaknesses, considering how each impacts the overall assessment. Your analysis should balance detailed evaluations with the broader context of the reviewers\' sentiments, ensuring that significant strengths are not overshadowed by weaknesses. Aim for a comprehensive understanding that can guide final decisions on the paper." 
+
+     - test F1 score not improving or degraded within 6 rounds 
+
 
     
 

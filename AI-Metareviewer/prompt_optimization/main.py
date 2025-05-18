@@ -60,7 +60,7 @@ def get_args():
     parser.add_argument('--eval_model', default='gpt-4o-mini')
     
     # parser.add_argument('--config', default='default.json')
-    parser.add_argument('--out', default='results/eval-240/bf-mini-eval240-ori-tp0.7-bs5-44320-max6.out')
+    parser.add_argument('--out', default='results/eval-240/ucb-ori-mini-eval240-adverial_test200.out')
     parser.add_argument('--max_threads', default=8, type=int)
     parser.add_argument('--temperature', default=0.0, type=float)
     parser.add_argument('--expansion_temperature', default=0.7, type=float)
@@ -81,7 +81,7 @@ def get_args():
     parser.add_argument('--max_expansion_factor', default=6, type=int)
 
     parser.add_argument('--engine', default="chatgpt", type=str)
-    parser.add_argument('--evaluator', default="bf", type=str)
+    parser.add_argument('--evaluator', default="ucb", type=str)
     parser.add_argument('--scorer', default="01", type=str)
 
     # selection parameters
@@ -135,6 +135,7 @@ if __name__ == '__main__':
     
     candidates = [open(fp.strip()).read() for fp in args.prompts.split(',')]
 
+    # candidates = ['# Task\n"Evaluate the following academic paper reviews by categorizing the comments into soundness, presentation, and contribution. Emphasize the reviewers\' confidence levels and final ratings as they are crucial indicators of the paper\'s likelihood of acceptance. Highlight both key strengths and weaknesses, considering how each impacts the overall assessment. Your analysis should balance detailed evaluations with the broader context of the reviewers\' sentiments, ensuring that significant strengths are not overshadowed by weaknesses. Aim for a comprehensive understanding that can guide final decisions on the paper." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:']
 
 
     for round in tqdm(range(config['rounds'])):
