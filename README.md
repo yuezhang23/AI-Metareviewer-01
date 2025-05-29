@@ -1,5 +1,4 @@
-# Task
-Utilizing LLMs as Area Chair for Top ML Conferences
+# LLMs as Area Chair for Top ML Conferences
 
 ##### Author: Yue Zhang
 ##### With support from Andrew Bai
