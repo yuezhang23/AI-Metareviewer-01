@@ -58,19 +58,19 @@ def get_args():
     parser.add_argument('--data_dir', default='data/')
     parser.add_argument('--prompts', default='prompts/metareview.md')
     parser.add_argument('--model', default='gpt-4o-mini')
-    parser.add_argument('--eval_model', default='gpt-4.1-nano')
+    parser.add_argument('--eval_model', default='gpt-4o-mini')
     
     # parser.add_argument('--config', default='default.json')
-    parser.add_argument('--out', default='results/eval-240/gradient_nano_pre_+_mini_reason.out')
+    parser.add_argument('--out', default='results/balanced_160+160_neurips_2024.out')
     parser.add_argument('--max_threads', default=8, type=int)
     parser.add_argument('--temperature', default=0.0, type=float)
-    parser.add_argument('--expansion_temperature', default=0.4, type=float)
+    parser.add_argument('--expansion_temperature', default=0.7, type=float)
     parser.add_argument('--optimizer', default='nl-gradient')
 
     # rounds
     parser.add_argument('--rounds', default=6, type=int)
-    parser.add_argument('--beam_size', default=4, type=int)
-    parser.add_argument('--n_test_exs', default=200, type=int) 
+    parser.add_argument('--beam_size', default=5, type=int)
+    parser.add_argument('--n_test_exs', default=80, type=int) 
     parser.add_argument('--minibatch_size', default=64, type=int)
 
     # expansion parameters
@@ -122,8 +122,8 @@ if __name__ == '__main__':
     # config, evaluator, scorer, args.max_threads, bf_eval)
 
     # all balanced
-    train_exs = task.get_train_examples(config['data_dir'] + '/metareviewer_data_train_800.csv')
-    test_exs = task.get_test_examples(config['data_dir'] + '/metareviewer_data_test_200.csv')
+    train_exs = task.get_train_examples(config['data_dir'] + '/train_160+160_neurips_2024.csv')
+    test_exs = task.get_test_examples(config['data_dir'] + '/test_40+40_neurips_2024.csv')
 
     if os.path.exists(args.out):
         os.remove(args.out)
@@ -165,8 +165,8 @@ if __name__ == '__main__':
             if (args.n_test_exs > 100):
                 labels_total = []
                 preds_total = []
-                for i in range(args.n_test_exs // 50):
-                    _, f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs[i * 50 : (i + 1) * 50], n=50)
+                for i in range(args.n_test_exs // 40):
+                    _, f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs[i * 40 : (i + 1) * 40], n=40)
                     labels_total.extend(labels)
                     preds_total.extend(preds)
                 f1 = f1_score(labels_total, preds_total, average='micro')

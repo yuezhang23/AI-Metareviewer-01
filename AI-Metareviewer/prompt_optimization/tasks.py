@@ -89,7 +89,8 @@ class ClassificationTask(DataProcessor):
                             print(f"Error processing example: {str(e)}")
                             continue
 
-        accuracy = accuracy_score(labels, preds)
+        print(f"labels: {labels}")
+        print(f"preds: {preds}")
         f1 = f1_score(labels, preds, average='micro')
         return ids, f1, texts, labels, preds
 

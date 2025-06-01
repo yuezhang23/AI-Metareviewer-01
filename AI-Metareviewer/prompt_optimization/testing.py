@@ -56,9 +56,9 @@ def get_train_examples():
     with psycopg.connect(os.getenv("DB_CONFIG"), row_factory=dict_row) as conn:
         with conn.cursor() as cur:
             # Get test data
-            cur.execute("""(SELECT id, decision FROM metareviews_2025_ICLR WHERE LOWER(decision) LIKE '%reject%' ORDER BY RANDOM() LIMIT 100) 
+            cur.execute("""(SELECT id, decision FROM metareviews_2023_NeurIPS WHERE LOWER(decision) LIKE '%reject%' ORDER BY RANDOM()) 
                         UNION ALL 
-                        (SELECT id, decision FROM metareviews_2025_ICLR WHERE LOWER(decision) LIKE '%accept%' ORDER BY RANDOM() LIMIT 100)""")
+                        (SELECT id, decision FROM metareviews_2023_NeurIPS WHERE LOWER(decision) LIKE '%accept%' ORDER BY RANDOM())""")
             test_metareviews = cur.fetchall()
             
             for metareview in test_metareviews:
@@ -66,7 +66,7 @@ def get_train_examples():
                 decision = metareview["decision"]
                 promptText = ""
 
-                cur.execute("SELECT * FROM reviews_2025_ICLR WHERE id = %s", [id])
+                cur.execute("SELECT * FROM reviews_2023_NeurIPS WHERE id = %s", [id])
                 allReviews = cur.fetchall()
 
                 for review in allReviews: 
@@ -74,52 +74,15 @@ def get_train_examples():
 
                 test_exs.append({'id': id, 'text': promptText, 'label': 1 if "accept" in decision.lower() else 0})
 
-    # Get training data (800 accept + 800 reject)
-    train_exs = []
-    with psycopg.connect(os.getenv("DB_CONFIG"), row_factory=dict_row) as conn:
-        with conn.cursor() as cur:
-            # Get training data (excluding test IDs)
-            test_ids = [ex['id'] for ex in test_exs]
-            test_ids_str = ','.join([f"'{id}'" for id in test_ids])
-            
-            cur.execute(f"""((SELECT id, decision FROM metareviews_2025_ICLR 
-                            WHERE LOWER(decision) LIKE '%reject%' 
-                            AND id NOT IN ({test_ids_str})
-                            ORDER BY RANDOM() LIMIT 800)
-                        UNION ALL 
-                        (SELECT id, decision FROM metareviews_2025_ICLR 
-                            WHERE LOWER(decision) LIKE '%accept%' 
-                            AND id NOT IN ({test_ids_str})
-                            ORDER BY RANDOM() LIMIT 800))""")
-            train_metareviews = cur.fetchall()
-            
-            for metareview in train_metareviews:
-                id = metareview["id"]
-                decision = metareview["decision"]
-                promptText = ""
-
-                cur.execute("SELECT * FROM reviews_2025_ICLR WHERE id = %s", [id])
-                allReviews = cur.fetchall()
-
-                for review in allReviews: 
-                    promptText += toString(review)
-
-                train_exs.append({'id': id, 'text': promptText, 'label': 1 if "accept" in decision.lower() else 0})
 
     # Save test data
     header = ['id', 'text', 'label']
-    with open('./data/metareviewer_data_test_200.csv', 'w', newline='', encoding="utf-8") as file:
+    with open('./data/metareviewer_data_all_2023_NeurIPS.csv', 'w', newline='', encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=header, delimiter=";")
         writer.writeheader()  
         writer.writerows(test_exs)
 
-    # Save training data
-    with open('./data/metareviewer_data_train_800.csv', 'w', newline='', encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=header, delimiter=";")
-        writer.writeheader()  
-        writer.writerows(train_exs)
-
-    return train_exs, test_exs
+    return test_exs
 
 def get_additional_train_examples():
     # Read existing data from data.csv
@@ -143,12 +106,12 @@ def get_additional_train_examples():
             # Get additional training data (excluding existing IDs)
             existing_ids_str = ','.join([f"'{id}'" for id in existing_ids]) if existing_ids else "''"
             
-            cur.execute(f"""((SELECT id, decision FROM metareviews_2025_ICLR 
+            cur.execute(f"""((SELECT id, decision FROM metareviews_2024_NeurIPS 
                             WHERE LOWER(decision) LIKE '%reject%' 
                             AND id NOT IN ({existing_ids_str})
                             ORDER BY RANDOM() LIMIT 800)
                         UNION ALL 
-                        (SELECT id, decision FROM metareviews_2025_ICLR 
+                        (SELECT id, decision FROM metareviews_2024_NeurIPS 
                             WHERE LOWER(decision) LIKE '%accept%' 
                             AND id NOT IN ({existing_ids_str})
                             ORDER BY RANDOM() LIMIT 800))""")
@@ -159,7 +122,7 @@ def get_additional_train_examples():
                 decision = metareview["decision"]
                 promptText = ""
 
-                cur.execute("SELECT * FROM reviews_2025_ICLR WHERE id = %s", [id])
+                cur.execute("SELECT * FROM reviews_2024_NeurIPS WHERE id = %s", [id])
                 allReviews = cur.fetchall()
 
                 for review in allReviews: 
@@ -169,7 +132,7 @@ def get_additional_train_examples():
 
     # Save additional data
     header = ['id', 'text', 'label']
-    with open('./data/additional_data_800+800_2025_ICLR.csv', 'w', newline='', encoding="utf-8") as file:
+    with open('./data/additional_data_800+800_2024_NeurIPS.csv', 'w', newline='', encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=header, delimiter=";")
         writer.writeheader()  
         writer.writerows(additional_exs)
@@ -183,5 +146,5 @@ def get_additional_train_examples():
 #     print(exs)
 #     return exs
 
-# get_train_examples()
-get_additional_train_examples()
+get_train_examples()
+# get_additional_train_examples()

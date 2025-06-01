@@ -26,12 +26,12 @@ client = openreview.api.OpenReviewClient(
     password=config["OPENREVIEW_PASSWORD"]
 )
 
-venue_id = 'ICLR.cc/2025/Conference'
+venue_id = 'NeurIPS.cc/2023/Conference'
 
 # First get all valid submission IDs from metareviews table
 with psycopg.connect(config["DB_CONFIG"]) as conn:
     with conn.cursor() as cur:
-        cur.execute("SELECT id FROM metareviews_2025_ICLR")
+        cur.execute("SELECT id FROM metareviews_2023_NeurIPS")
         valid_submission_ids = {row[0] for row in cur.fetchall()}
 
 venue_group = client.get_group(venue_id)
@@ -72,7 +72,7 @@ with psycopg.connect(config["DB_CONFIG"]) as conn:
                         values.append(value)
                     
                     cur.execute("""
-                        INSERT INTO reviews_2025_ICLR (id, summary, soundness, presentation, contribution, strengths, weaknesses, questions, limitations, rating, confidence)
+                        INSERT INTO reviews_2023_NeurIPS (id, summary, soundness, presentation, contribution, strengths, weaknesses, questions, limitations, rating, confidence)
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         """,
                         (r.replyto, *values)

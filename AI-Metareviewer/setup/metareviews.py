@@ -9,7 +9,7 @@ client = openreview.api.OpenReviewClient(
     password=config["OPENREVIEW_PASSWORD"]
 )
 
-venue_id = 'ICLR.cc/2025/Conference'
+venue_id = 'NeurIPS.cc/2023/Conference'
 
 venue_group_settings = client.get_group(venue_id).content
 submission_invitation = venue_group_settings['submission_id']['value']
@@ -40,7 +40,7 @@ for submission in submissions:
                         values.append(value)
 
                     cur.execute("""
-                    INSERT INTO metareviews_2025_ICLR (id, decision, comment)
+                    INSERT INTO metareviews_2023_NeurIPS (id, decision, comment)
                     VALUES (%s, %s, %s)
                     ON CONFLICT (id) DO UPDATE
                     SET decision = EXCLUDED.decision,

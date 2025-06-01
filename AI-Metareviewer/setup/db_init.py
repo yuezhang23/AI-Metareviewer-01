@@ -6,14 +6,14 @@ config = dotenv_values(".env")
 with psycopg.connect(config["DB_CONFIG"]) as conn:
     with conn.cursor() as cur:
         cur.execute("""
-                CREATE TABLE IF NOT EXISTS metareviews_2025_ICLR (
+                CREATE TABLE IF NOT EXISTS metareviews_2023_NeurIPS (
                 id VARCHAR(25) PRIMARY KEY,
                 decision TEXT,
                 comment TEXT NULL
             );""")
         cur.execute("""
-            CREATE TABLE IF NOT EXISTS reviews_2025_ICLR (
-                id VARCHAR(25) REFERENCES metareviews_2025_ICLR(id),
+                CREATE TABLE IF NOT EXISTS reviews_2023_NeurIPS (
+                id VARCHAR(25) REFERENCES metareviews_2023_NeurIPS(id),
                 summary TEXT,
                 soundness TEXT,
                 presentation TEXT,

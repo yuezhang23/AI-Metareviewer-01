@@ -66,7 +66,7 @@ class ProTeGi(PromptOptimizer):
         But this prompt gets the following examples wrong:
         {error_string}
 
-        give {num_feedbacks} reasons why the prompt could have gotten these examples wrong.
+        give {num_feedbacks} different reasons why the prompt incorrectly classified these examples.
         Wrap each reason with <START> and <END>
         """
         gradient_prompt = '\n'.join([line.lstrip() for line in gradient_prompt.split('\n')])
@@ -128,7 +128,7 @@ class ProTeGi(PromptOptimizer):
         new_responses = []
         for prompt in tqdm(prompts, desc=f'expanding {len(prompts)} prompts'):
             # evaluate prompt on minibatch
-            _, f1, texts, labels, preds = task.evaluate(gpt4, prompt, minibatch, self.opt['minibatch_size'], )
+            _, f1, texts, labels, preds = task.evaluate(gpt4, prompt, minibatch, self.opt['minibatch_size'] )
             print(f"\n\ncheck f1 on tr-64: {f1}\n\n")
             new_responses.append([f1, texts, labels, preds])
 

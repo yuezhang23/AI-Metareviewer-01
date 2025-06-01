@@ -15,7 +15,8 @@ if __name__ == '__main__':
     # Round - from prior results
     # candidates = ['# Task: Given the reviews (Text), conduct a rigorous evaluation of the proposed research, focusing on theoretical contributions, empirical validation, and practical implications. Assess the innovation and significance of the methodology, the clarity of the presentation, and the relevance of experimental results. Provide a definitive recommendation for acceptance (Yes) or rejection (No), while identifying key strengths, weaknesses, and actionable suggestions for enhancing the impact and applicability of the research. Ensure that your assessment is comprehensive, insightful, and well-supported by evidence from the reviews, addressing any significant concerns raised by the reviewers." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:']
     candidates = [
-        "# Task: Evaluate the peer assessments of the research paper by synthesizing the strengths related to originality, clarity, and empirical results while addressing the cited weaknesses. Determine if the research's merits convincingly advocate for approval despite any identified shortcomings, which should not detract significantly from the paper’s overall value. Conclude with 'Yes' if the strengths substantially support acceptance; otherwise, respond with 'No' for rejection. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:"]
+        "# Task: Examine the provided reviews meticulously, focusing on key aspects such as the soundness of the presented methods, presentation quality, and overall contributions to the field of federated learning. Identify notable strengths despite any outlined weaknesses and consider whether the overall evaluation leans towards acceptance of the paper. Based on this balanced assessment, determine if the combined positive sentiments justify a conclusion of Yes for acceptance or No for rejection. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",]
+        # "# Task: Evaluate the peer assessments of the research paper by synthesizing the strengths related to originality, clarity, and empirical results while addressing the cited weaknesses. Determine if the research's merits convincingly advocate for approval despite any identified shortcomings, which should not detract significantly from the paper’s overall value. Conclude with 'Yes' if the strengths substantially support acceptance; otherwise, respond with 'No' for rejection. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:"]
         # human
         # "# Task: Given the following reviews (text), determine accepted (Yes) or not (No). \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
         # OPRO-t0.83
@@ -30,16 +31,18 @@ if __name__ == '__main__':
         # '# Task\n"Analyze the following reviews (text) and determine if the paper would be accepted (Yes) or rejected (No) by an academic conference. Consider the overall sentiment and narrative formed by the critiques provided by the reviewers. Focus on their assessments of soundness, presentation, and contribution, as well as the significance of the strengths and weaknesses mentioned. Pay close attention to the ratings given, especially those that are \'marginally below the acceptance threshold,\' as these indicate that the paper has merit and should be evaluated with nuance. Look for patterns in the reviewers\' consensus or differing opinions, and consider how the collective feedback indicates a leaning towards acceptance or rejection. Justify your decision based on these insights from the reviews, ensuring that you account for the context of the ratings provided." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:',]
         # '# Task\n"Evaluate the following reviews (text) to determine whether the paper is likely to be accepted (Yes) or rejected (No) by an academic conference. Focus primarily on the overall sentiment conveyed in the reviews, considering the strengths and weaknesses highlighted by the reviewers. Take into account the reviewers\' confidence levels and how they weigh the positive aspects against the negative critiques. Pay special attention to instances where significant positive contributions or strong experimental results may outweigh the weaknesses mentioned. Provide a clear justification for your decision that reflects this overall sentiment and balance in evaluations." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:',]
 
-    args = {"task": "metareviewer", "data_dir": "data/", "prompts": "prompts/metareview.md", "model": "gpt-4o-mini", "eval_model": "gpt-4o-mini", "out": "results/eval-240/test_top_prompts.out", "max_threads": 8, "temperature": 0.0, "expansion_temperature": 0.7, "optimizer": "nl-gradient", "rounds": 8, "beam_size": 5, "n_test_exs": 400, "minibatch_size": 64, "n_gradients": 4, "errors_per_gradient": 4, "gradients_per_error": 1, "steps_per_gradient": 1, "mc_samples_per_step": 2, "max_expansion_factor": 8, "engine": "chatgpt", "evaluator": "bf", "scorer": "01", "eval_rounds": 5, "eval_prompts_per_round": 6, "samples_per_eval": 8, "c": 2.0, "knn_k": 2, "knn_t": 0.993, "reject_on_errors": False, "eval_budget": 240}
+    
+    args = {"task": "metareviewer", "data_dir": "data/", "prompts": "prompts/metareview.md", "model": "gpt-4o-mini", "eval_model": "gpt-4o-mini", "out": "results/eval-240/test_top_prompts.out", "max_threads": 8, "temperature": 0.0, "expansion_temperature": 0.7, "optimizer": "nl-gradient", "rounds": 8, "beam_size": 5, "n_test_exs": 300, "minibatch_size": 64, "n_gradients": 4, "errors_per_gradient": 4, "gradients_per_error": 1, "steps_per_gradient": 1, "mc_samples_per_step": 2, "max_expansion_factor": 8, "engine": "chatgpt", "evaluator": "bf", "scorer": "01", "eval_rounds": 5, "eval_prompts_per_round": 6, "samples_per_eval": 8, "c": 2.0, "knn_k": 2, "knn_t": 0.993, "reject_on_errors": False, "eval_budget": 240}
 
     # List of test files to evaluate
     test_files = [
-        'data/additional_data_800+800_2023_NeurIPS.csv',
-        'data/additional_data_800+800_2024_NeurIPS.csv',
-        'data/additional_data_800+800_2024_ICLR.csv',   
-        'data/additional_data_800+800_2025_ICLR.csv',
+        # 'data/additional_data_800+800_2023_NeurIPS.csv',
+        # 'data/additional_data_800+800_2024_NeurIPS.csv',
+        # 'data/additional_data_800+800_2024_ICLR.csv',   
+        # 'data/additional_data_800+800_2025_ICLR.csv',
         # "data/metareviewer_data_train_800.csv",
         # "data/metareviewer_data_test_200.csv",
+        'data/balanced_150+150_neurips_2023.csv'
     ]
 
     with open(args["out"], 'a') as outf:
@@ -55,7 +58,7 @@ if __name__ == '__main__':
         
         test_exs = task.get_test_examples(test_file)
 
-        for _ in range(4):   
+        for _ in range(1):   
             test_batch = random.sample(test_exs, k=args["n_test_exs"])
             f1s = []
             for candidate in candidates:
