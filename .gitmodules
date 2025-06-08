@@ -1,6 +1,0 @@
-[submodule "AI-Metareviewer/OPRO/opro_meta_review"]
-	path = AI-Metareviewer/OPRO/opro_meta_review
-	url = https://github.com/yuezhang23/opro_meta_review.git
-[submodule "AI-Metareviewer/opro_meta_review"]
-	path = AI-Metareviewer/opro_meta_review
-	url = https://github.com/yuezhang23/opro_meta_review.git
