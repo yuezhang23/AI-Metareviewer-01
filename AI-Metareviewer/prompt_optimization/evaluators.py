@@ -197,6 +197,7 @@ class UCBBanditEvaluator:
 
         num_prompts_per_round = min(num_prompts_per_round, len(prompts))
 
+        print(f'\nStarting evaluation on UCB...\n')
         for ri in tqdm(range(rounds), desc=f'Evaluating {len(prompts)} prompts'):
             # Sample the prompts
             sampled_prompts_idx = bandit_algo.choose(num_prompts_per_round, ri)

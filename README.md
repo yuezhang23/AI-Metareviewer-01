@@ -27,7 +27,7 @@ This study focuses on optimizing nonparametric algorithms for academic paper rev
 
 ### Dataset Configuration
 - Source: venue_id = '[NeurIPS.cc/2024/Conference](https://neurips.cc/Conferences/2024)'
-- Test dataset: 800 accept + 200 reject
+- Dataset: 800 accept + 200 reject
 - Train data: minibatch = 64 
 - Test data: 100 accept + 100 reject
 

@@ -13,6 +13,7 @@ import predictors
 import optimizers
 import optimizers_ds
 from sklearn.metrics import f1_score
+from data import balance_subset
 
 def get_task_class(task_name):
     if task_name == 'ethos':
@@ -61,7 +62,7 @@ def get_args():
     parser.add_argument('--eval_model', default='gpt-4o-mini')
     
     # parser.add_argument('--config', default='default.json')
-    parser.add_argument('--out', default='results/balanced_160+160_neurips_2024.out')
+    parser.add_argument('--out', default='results/train_on_balanced_data.out')
     parser.add_argument('--max_threads', default=8, type=int)
     parser.add_argument('--temperature', default=0.0, type=float)
     parser.add_argument('--expansion_temperature', default=0.7, type=float)
@@ -70,7 +71,7 @@ def get_args():
     # rounds
     parser.add_argument('--rounds', default=6, type=int)
     parser.add_argument('--beam_size', default=5, type=int)
-    parser.add_argument('--n_test_exs', default=80, type=int) 
+    parser.add_argument('--n_test_exs', default=200, type=int) 
     parser.add_argument('--minibatch_size', default=64, type=int)
 
     # expansion parameters
@@ -122,8 +123,8 @@ if __name__ == '__main__':
     # config, evaluator, scorer, args.max_threads, bf_eval)
 
     # all balanced
-    train_exs = task.get_train_examples(config['data_dir'] + '/train_160+160_neurips_2024.csv')
-    test_exs = task.get_test_examples(config['data_dir'] + '/test_40+40_neurips_2024.csv')
+    train_exs = task.get_train_examples(config['data_dir'] + '/metareviewer_data_train_800.csv')
+    test_exs = task.get_test_examples(config['data_dir'] + '/metareviewer_data_test_200.csv')
 
     if os.path.exists(args.out):
         os.remove(args.out)
@@ -135,29 +136,36 @@ if __name__ == '__main__':
     
     candidates = [open(fp.strip()).read() for fp in args.prompts.split(',')]
 
-    # candidates = ['# Task\n"Evaluate the following academic paper reviews by categorizing the comments into soundness, presentation, and contribution. Emphasize the reviewers\' confidence levels and final ratings as they are crucial indicators of the paper\'s likelihood of acceptance. Highlight both key strengths and weaknesses, considering how each impacts the overall assessment. Your analysis should balance detailed evaluations with the broader context of the reviewers\' sentiments, ensuring that significant strengths are not overshadowed by weaknesses. Aim for a comprehensive understanding that can guide final decisions on the paper." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:']
+    # candidates = ['# Task\n"Evaluate the following reviews (text) to determine whether the paper is likely to be accepted (Yes) or rejected (No) by an academic conference. Focus primarily on the overall sentiment conveyed in the reviews, considering the strengths and weaknesses highlighted by the reviewers. Take into account the reviewers\' confidence levels and how they weigh the positive aspects against the negative critiques. Pay special attention to instances where significant positive contributions or strong experimental results may outweigh the weaknesses mentioned. Provide a clear justification for your decision that reflects this overall sentiment and balance in evaluations." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:',]
 
+
+    # for round in tqdm(range(config['rounds'])):
     for round in tqdm(range(config['rounds'])):
         print("STARTING ROUND ", round + 1)
         start = time.time()
 
-        candidates = optimizer.expand_candidates(candidates, task, gpt4, train_exs)
-        candidates = random.sample(candidates, k=config['beam_size'])
+        # # balance train examples based on 800:100 ratio, sample 100:100
+        # balanced_train_exs = balance_subset.create_balanced_subset(train_exs, cnt=round)
 
-        # scores = optimizer.score_candidates(candidates, task, gpt4, train_exs)
+        # # expand candidates
+        # # if round > 0:
+        # candidates = optimizer.expand_candidates(candidates, task, gpt4, balanced_train_exs)
+
+        # # score candidates
+        # scores = optimizer.score_candidates(candidates, task, gpt4, balanced_train_exs)
         # [scores, candidates] = list(zip(*sorted(list(zip(scores, candidates)), reverse=True)))
 
         # # select candidates
         # candidates = candidates[:config['beam_size']]
         # scores = scores[:config['beam_size']]
 
-        # record candidates, estimated scores, and true scores
-        with open(args.out, 'a') as outf:
-            outf.write(f"======== ROUND {round + 1}\n")
-            # outf.write(f'{time.time() - start}\n')
-            outf.write(f'{candidates}\n')
-            # outf.write(f'{[float(score) for score in scores]}\n')
-            # outf.write('f1\n')
+        # # record candidates, estimated scores, and true scores
+        # with open(args.out, 'a') as outf:
+        #     outf.write(f"======== ROUND {round + 1}\n")
+        #     # outf.write(f'{time.time() - start}\n')
+        #     outf.write(f'{candidates}\n')
+        #     outf.write(f'{[float(score) for score in scores]}\n')
+        #     outf.write('f1\n')
 
         metrics = []
         # for candidate, score in zip(candidates, scores):
@@ -165,15 +173,16 @@ if __name__ == '__main__':
             if (args.n_test_exs > 100):
                 labels_total = []
                 preds_total = []
-                for i in range(args.n_test_exs // 40):
-                    _, f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs[i * 40 : (i + 1) * 40], n=40)
+                for i in range(args.n_test_exs // 50):
+                    print(f"\ni : {i}\n")
+                    _, f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs[i * 50 : (i + 1) * 50], n=50)
                     labels_total.extend(labels)
                     preds_total.extend(preds)
                 f1 = f1_score(labels_total, preds_total, average='micro')
-                print(f"len(preds): {len(preds_total)}")
+                print(f"\nlen(preds): {len(preds_total)}\n")
             else:
                 _, f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs, n=args.n_test_exs)   
-                print(f"len(preds): {len(preds)}")
+                print(f"\nlen(preds): {len(preds)}\n")
             metrics.append(f1)
             with open(args.out, 'a') as outf:  
                 outf.write(f'{metrics}\n')

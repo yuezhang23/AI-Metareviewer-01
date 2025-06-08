@@ -13,6 +13,10 @@ class GPT4Predictor(ABC):
     def inference(self, ex, prompt):
         pass
 
+    @abstractmethod
+    def batch_inference(self, examples, prompt):
+        pass
+
 class BinaryPredictor(GPT4Predictor):
     categories = ['No', 'Yes']
 

@@ -168,8 +168,9 @@ class ProTeGi(PromptOptimizer):
                 prompt.replace(task_section, tmp) 
                 for tmp in new_sections
             ]
-            print(f"\nnew_sections: {len(new_sections)}\n")
-            
+
+            print(f"\nnew_prompts_bf_filter: {len(tmp_new_prompts)}\n")
+           
             # filter a little
             if len(new_sections) > self.opt['max_expansion_factor']:
                 if self.opt['reject_on_errors']:
@@ -192,6 +193,7 @@ class ProTeGi(PromptOptimizer):
 
         # new_prompts += prompts # add originals
         new_prompts = list(set(new_prompts)) # dedup
+        print(f"\nnew_prompts: {len(new_prompts)}\n")
         return new_prompts
 
     def score_candidates(self, prompts, task, gpt4, train_exs):

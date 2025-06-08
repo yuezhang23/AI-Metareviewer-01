@@ -10,6 +10,7 @@ from custom_utils import toString
 import psycopg
 from psycopg.rows import dict_row
 import time
+from collections import Counter
 
 class DataProcessor(ABC):
     def __init__(self, data_dir, max_threads=1):
@@ -76,8 +77,14 @@ class ClassificationTask(DataProcessor):
         else:
             with tqdm(total=total_examples, desc='Evaluating examples') as pbar:
                 with concurrent.futures.ProcessPoolExecutor(max_workers=self.max_threads) as executor:
-                    futures = [executor.submit(process_example, ex, predictor, prompt) for ex in test_exs[:total_examples]]
-                    for future in concurrent.futures.as_completed(futures): 
+                    # Submit all tasks at once
+                    future_to_ex = {
+                        executor.submit(process_example, ex, predictor, prompt): ex 
+                        for ex in test_exs[:total_examples]
+                    }
+                    
+                    # Process results as they complete
+                    for future in concurrent.futures.as_completed(future_to_ex):
                         try:
                             ex, pred = future.result()
                             ids.append(ex['id'])
@@ -89,8 +96,9 @@ class ClassificationTask(DataProcessor):
                             print(f"Error processing example: {str(e)}")
                             continue
 
-        print(f"labels: {labels}")
-        print(f"preds: {preds}")
+        # label_counts = Counter(labels)
+        # print("Label distribution:", dict(label_counts))
+
         f1 = f1_score(labels, preds, average='micro')
         return ids, f1, texts, labels, preds
 
