@@ -62,7 +62,7 @@ def get_args():
     parser.add_argument('--eval_model', default='gpt-4o-mini')
     
     # parser.add_argument('--config', default='default.json')
-    parser.add_argument('--out', default='results/train_on_data_8v1_neurips.out')
+    parser.add_argument('--out', default='results/train_on_data_1v1_neurips.out')
     parser.add_argument('--max_threads', default=8, type=int)
     parser.add_argument('--temperature', default=0.0, type=float)
     parser.add_argument('--expansion_temperature', default=0.7, type=float)
@@ -144,10 +144,10 @@ if __name__ == '__main__':
         start = time.time()
 
         # use balance train examples, sample 100:100
-        # train_exs = balance_subset.create_balanced_subset(train_exs_ori, cnt=round)
+        train_exs = balance_subset.create_balanced_subset(train_exs_ori, cnt=round)
 
         # use original train examples
-        train_exs = train_exs_ori
+        # train_exs = train_exs_ori
 
         # expand candidates
         # if round > 0:
