@@ -62,14 +62,14 @@ def get_args():
     parser.add_argument('--eval_model', default='gpt-4o-mini')
     
     # parser.add_argument('--config', default='default.json')
-    parser.add_argument('--out', default='results/train_on_data_1v1_neurips.out')
+    parser.add_argument('--out', default='results/train_on_data_1v1_continue_tp1.2.out')
     parser.add_argument('--max_threads', default=8, type=int)
     parser.add_argument('--temperature', default=0.0, type=float)
-    parser.add_argument('--expansion_temperature', default=0.7, type=float)
+    parser.add_argument('--expansion_temperature', default=1.2, type=float)
     parser.add_argument('--optimizer', default='nl-gradient')
 
     # rounds
-    parser.add_argument('--rounds', default=6, type=int)
+    parser.add_argument('--rounds', default=12, type=int)
     parser.add_argument('--beam_size', default=5, type=int)
     parser.add_argument('--n_test_exs', default=200, type=int) 
     parser.add_argument('--minibatch_size', default=64, type=int)
@@ -125,8 +125,6 @@ if __name__ == '__main__':
     # all balanced
     train_exs_ori = task.get_train_examples(config['data_dir'] + '/metareviewer_data_train_800.csv')
     test_exs = task.get_test_examples(config['data_dir'] + '/metareviewer_data_test_200.csv')
-    # train_exs = task.get_train_examples(config['data_dir'] + '/700+700_iclr_2025_train.csv')
-    # test_exs = task.get_test_examples(config['data_dir'] + '/100+100_iclr_2025_test.csv')
 
     if os.path.exists(args.out):
         os.remove(args.out)
@@ -138,6 +136,7 @@ if __name__ == '__main__':
     
     candidates = [open(fp.strip()).read() for fp in args.prompts.split(',')]
 
+ 
     # for round in tqdm(range(config['rounds'])):
     for round in tqdm(range(config['rounds'])):
         print("STARTING ROUND ", round + 1)

@@ -127,6 +127,14 @@ class ProTeGi(PromptOptimizer):
         """
         minibatch = random.sample(train_exs, k=self.opt['minibatch_size'])
 
+        # count minibatch distribution 
+        minibatch_distribution = {}
+        for ex in minibatch:
+            if ex['label'] not in minibatch_distribution:
+                minibatch_distribution[ex['label']] = 0
+            minibatch_distribution[ex['label']] += 1
+        print(f"\nminibatch distribution: {minibatch_distribution}\n")
+
         new_responses = []
         for prompt in tqdm(prompts, desc=f'expanding {len(prompts)} prompts'):
             # evaluate prompt on minibatch

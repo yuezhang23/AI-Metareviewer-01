@@ -10,12 +10,12 @@ This study focuses on optimizing nonparametric algorithms for academic paper rev
 #### Biased Prompt 
 - Prompt: 
 `Analyze the reviews provided, decide if the paper in question would be accepted at an academic conference. The vast majority of papers are accepted. About 0.05 of papers are rejected at the conference. Answer only ACCEPT or REJECT`
-- Test F1 - 4o-mini: 0.75
+- Test F1 - 4o-mini: 0.67
 
 #### Neutral Prompts 
 - Inital Prompt for this task: 
   `Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference.`
-   - Test F1 - 4o-mini: 0.692
+   - Test F1 - 4o-mini: 0.69
    - Test F1 - 4.1-nano: 0.55
 
 - Optional: 
