@@ -208,7 +208,7 @@ Wrap each reason with <START> and <END>
 
 ## Citation
 ```
-@misc{yuan2021automate,
+@article{
       title={Automatic Prompt Optimization with "Gradient Descent" and Beam Search}, 
       author={Reid Pryzant, Dan Iter, Jerry Li, Yin Tat Lee, Chenguang Zhu, Michael Zeng},
       year={2023},
