@@ -71,6 +71,7 @@ class ProTeGi(PromptOptimizer):
         """
         gradient_prompt = '\n'.join([line.lstrip() for line in gradient_prompt.split('\n')])
         res = utils.chatgpt(gradient_prompt, self.opt['model'], self.opt['expansion_temperature'], n=n)
+        print(res)
         feedbacks = []
         new_prompts = []
         for r in res:    

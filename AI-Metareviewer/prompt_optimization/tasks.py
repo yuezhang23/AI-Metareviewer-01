@@ -92,7 +92,7 @@ class ClassificationTask(DataProcessor):
 
         # label_counts = Counter(labels)
         # print("Label distribution:", dict(label_counts))
-
+        accuracy = accuracy_score(labels, preds)
         f1 = f1_score(labels, preds, average='micro')
         return ids, f1, texts, labels, preds
 

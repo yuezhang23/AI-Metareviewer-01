@@ -12,8 +12,11 @@ import uuid
 import json
 import asyncio
 import aiohttp
+from openai import OpenAI
+
 
 config = dotenv_values(".env")
+client = OpenAI(api_key=config["OPENAI_API_KEY"])
 
 def parse_sectioned_prompt(s):
 
@@ -127,54 +130,78 @@ def parse_sectioned_prompt(s):
 #         raise Exception(f"Request failed: {str(e)}")
 
 
+def prompt(prompt, model="o4-mini", reasoning={"effort": "medium"}):
+    messages = [{"role": "user", "content": prompt}]
+    completion = client.chat.completions.create(
+        model=model,
+        reasoning=reasoning,
+        messages=messages,
+        max_tokens=1024
+    )
+    return completion.choices[0].message.content
+
+
+
 def chatgpt(prompt, model, temperature=0.0, n=1, top_p=1, stop=None, max_tokens=1024, 
                   presence_penalty=0, frequency_penalty=0, logit_bias={}, timeout=30):
+      
     messages = [{"role": "user", "content": prompt}]
-    payload = {
-        "messages": messages,
-        "model": model,
-        "temperature": temperature,
-        "n": n,
-        "top_p": top_p,
-        "stop": stop,
-        "max_tokens": max_tokens,
-        "presence_penalty": presence_penalty,
-        "frequency_penalty": frequency_penalty,
-        "logit_bias": logit_bias
-    } 
-    max_retries = 6
-    base_delay = 1
+
+    if model == "o4-mini":
+        response = client.responses.create(
+            model="o4-mini",
+            reasoning={"effort": "high"},
+            input=messages,
+        )
+        print(response.output_text)
+        return [response.output_text]
     
-    for retry in range(max_retries):
-        try:
-            r = requests.post('https://api.openai.com/v1/chat/completions',
-                headers = {
-                    "Authorization": f"Bearer {config['OPENAI_API_KEY']}",
-                    "Content-Type": "application/json"
-                },
-                json = payload,
-                timeout=timeout
-            )
-            
-            if r.status_code == 200:
-                r = r.json()
-                return [choice['message']['content'] for choice in r['choices']]
-            elif r.status_code == 429:  # Rate limit error
-                retry_after = int(r.headers.get('Retry-After', base_delay * (2 ** retry)))
-                print(f"Rate limit hit. Waiting {retry_after} seconds...")
-                time.sleep(retry_after)
-            else:
-                print(f"API Error - Status Code: {r.status_code}")
+    else:
+        payload = {
+            "messages": messages,
+            "model": model,
+            "temperature": temperature,
+            "n": n,
+            "top_p": top_p,
+            "stop": stop,
+            "max_tokens": max_tokens,
+            "presence_penalty": presence_penalty,
+            "frequency_penalty": frequency_penalty,
+            "logit_bias": logit_bias
+        } 
+        max_retries = 6
+        base_delay = 1
+        
+        for retry in range(max_retries):
+            try:
+                r = requests.post('https://api.openai.com/v1/chat/completions',
+                    headers = {
+                        "Authorization": f"Bearer {config['OPENAI_API_KEY']}",
+                        "Content-Type": "application/json"
+                    },
+                    json = payload,
+                    timeout=timeout
+                )
+                
+                if r.status_code == 200:
+                    r = r.json()
+                    return [choice['message']['content'] for choice in r['choices']]
+                elif r.status_code == 429:  # Rate limit error
+                    retry_after = int(r.headers.get('Retry-After', base_delay * (2 ** retry)))
+                    print(f"Rate limit hit. Waiting {retry_after} seconds...")
+                    time.sleep(retry_after)
+                else:
+                    print(f"API Error - Status Code: {r.status_code}")
+                    if retry < max_retries - 1:
+                        wait_time = base_delay * (2 ** retry)
+                        time.sleep(wait_time)
+                    
+            except requests.exceptions.RequestException:
                 if retry < max_retries - 1:
                     wait_time = base_delay * (2 ** retry)
                     time.sleep(wait_time)
-                
-        except requests.exceptions.RequestException:
-            if retry < max_retries - 1:
-                wait_time = base_delay * (2 ** retry)
-                time.sleep(wait_time)
-    
-    raise Exception(f"Failed to get response after {max_retries} retries")
+        
+        raise Exception(f"Failed to get response after {max_retries} retries")
 
 
 def instructGPT_logprobs(prompt, temperature=0.7, model="gpt-4o-mini"):

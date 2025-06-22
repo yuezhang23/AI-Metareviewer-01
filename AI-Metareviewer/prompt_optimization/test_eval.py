@@ -137,15 +137,86 @@ if __name__ == '__main__':
         # OPRO - 51 0.705
         '# Task\n"Perform a comprehensive review of the provided peer evaluations of the research paper, with a concentrated focus on the originality of the contributions, methodological integrity, theoretical and practical significance, as well as clarity of communication. Identify how the strengths elucidated by reviewers substantiate a strong case for acceptance (Yes), evidencing the ability of the findings to significantly advance the knowledge in the respective field, while addressing any minor weaknesses with constructive suggestions for improvement. Ensure the final recommendation conveys a well-grounded judgement on the merit of the paper’s impact and relevance in ongoing scholarly discussions." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:',
         # OPRO - 52 trial 
-        '# Task\n"Given the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference."\n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:',
-        ]
+        '# Task\n"Analyze the peer reviews of the research paper in question, emphasizing the innovative methods, quality of results, and clarity of presentation. Determine if the positive aspects identified by reviewers substantially outweigh the weaknesses indicated. Draft a comprehensive conclusion recommending either acceptance (Yes) or rejection (No), substantiating your position with detailed references from the reviews that illustrate the strengths of the research, while counteracting any critiques that may appear dichas emerging or reliant on misunderstandings. Ensure your final recommendation decisively captures the potential relevance and influence of the work in its field. Conclude with insights into future implications and applications of this research." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:',
+        # OPRO - 53 trial
+        # '# Task\n"Let r_i be each review’s numeric rating, c_i its confidence, s_i its count of strengths, and w_i its count of weaknesses. Compute R = (Σ_i r_i·c_i)/(Σ_i c_i) and F = (Σ_i s_i·c_i)/(Σ_i w_i·c_i) (treat F as ≥1 if Σ_i w_i·c_i=0). If R ≥ 6 AND F ≥ 1 output Yes; otherwise output No." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:',
+        # '# Task\n"Compute R = (∑ᵢ ratingᵢ × confidenceᵢ)/(∑ᵢ confidenceᵢ). Let S be the total strength mentions, W the total weakness mentions, and N the number of reviews. Define Δ = (S – W)/N. If R + Δ ≥ 6 output Yes; otherwise output No." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:',
+        # '# Task\n"Let r_i be the numeric rating, s_i the count of strengths, and w_i the count of weaknesses in review i. Compute the average rating R = (∑ᵢ r_i)/n and the average balance D = (∑ᵢ (s_i−w_i))/n, where n is the number of reviews. If R + D ≥ 5, output Yes; otherwise output No." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:',
+        '# Task\n"Evaluate the following academic paper reviews and conclude whether the paper warrants acceptance (Yes) or rejection (No). Focus on the significance of the paper\'s contributions to the field, taking into account the strengths highlighted by the reviewers. While valid criticisms should not be ignored, they should be weighed against the paper’s overall impact and advancements. Provide a synthesis that captures the essence of the reviewers\' comments, ensuring that your conclusion fairly represents the paper’s merit and potential influence in the domain."\n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:', 
+        # APO - 54
+        '# Task\n"Based on the provided review text, determine whether the review contains a positive recommendation for acceptance (Label: Yes) or a negative recommendation for rejection (Label: No). Evaluate the review using the following guiding principles:\n\n1. **Overall Assessment**: Consider if the review ultimately leans towards a positive or negative evaluation of the paper. This includes looking at the final rating and overall sentiment expressed throughout the review.\n  \n2. **Balance of Strengths and Weaknesses**: Assess whether the strengths of the paper are emphasized over the weaknesses. A recommendation for acceptance typically indicates that the positives outweigh the negatives.\n\n3. **Clarity of Recommendation**: Look for explicit language indicating acceptance or rejection, such as \'accept,\' \'reject,\' \'marginally above the threshold,\' or \'marginally below the threshold.\'\n\n4. **Significance of Contributions**: Evaluate the perceived impact and novelty of the contributions discussed in the review. Strong contributions that are recognized positively can lead to a recommendation for acceptance.\n\n5. **Limitations Discussion**: Consider how limitations are discussed. Acknowledging limitations is important, but if the review presents them as manageable or not significantly impactful, this can favor a positive recommendation.\n\nUse these principles to make a decision on the overall recommendation of the paper, focusing on the sentiment and clarity of the review." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:', 
+        # APO -55
+        '# Task\n"Evaluate the following academic reviews and classify the paper as likely accepted (Yes) or rejected (No). In your assessment, weigh the reviewers\' strengths, weaknesses, and overall ratings. Consider how strong positive aspects may counterbalance weaknesses or limitations in the reviews. Focus on the significance of the contributions, soundness of the methodology, and clarity of presentation. Ultimately, determine the paper\'s potential impact and quality in the field based on this nuanced evaluation." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:', 
+        # APO - 56
+        '# Task\n"Assess the academic evaluations of the paper presented below and decide on its acceptance status (Yes or No). Review the overall feedback provided by the reviewers, which includes their numerical ratings as well as qualitative comments. Focus on both the positive aspects and any shortcomings noted in the reviews, evaluating their relative impact. Consider the reviewers\' confidence in their assessments and the significance of their remarks regarding the paper\'s contributions to the field. If the positive attributes of the paper seem to surpass its drawbacks, or if the paper shows promise despite certain critiques, lean towards a decision in favor of acceptance. Arrive at a well-founded conclusion based on this thorough evaluation." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:',
+        # APO - 57
+        '# Task\n"Analyze the feedback provided on the academic paper, emphasizing the overall sentiment regarding its acceptance (Yes) or rejection (No) by the conference. Pay careful attention to the balance between strengths and weaknesses presented by the reviewers. Specifically, identify key phrases that indicate the reviewers\' final recommendations, such as \'marginally above the acceptance threshold\', \'borderline reject\', or \'high impact\'. Consider the possibility that a paper may have significant strengths that can overshadow its weaknesses, even when conflicting evaluations are present. Your conclusion should reflect a nuanced understanding of the paper',
+        # APO - 58
+        '# Task\n"Assess the feedback from the reviews of the paper below to determine the consensus on its acceptance. Consider both the strengths and weaknesses highlighted by each reviewer, along with their ratings and confidence levels. If reviewers provide mixed feedback or express both positive and negative sentiments, classify the outcome as \'Unsure.\' If the overall sentiment leans positively with sufficient justification for acceptance, label it \'Yes.\' Conversely, if the majority of feedback indicates significant issues with the paper, label it \'No.\' Focus on the essence of the reviews rather than the specific wording." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:', 
+        # APO - 59     
+        "# Task\nExamine the comments given in the reviews of the paper listed below to make a judgment on the overall acceptance decision. Take into account the reviewers' assessments regarding the paper's soundness, presentation, and contribution, while closely observing both the positive aspects and drawbacks noted in each review. It is crucial to evaluate how the strengths counterbalance the weaknesses and whether the overall impression favors acceptance or rejection. Following this thorough evaluation, classify the outcome as Accept (Yes), Reject (No), or Ambiguous (Unsure). \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:", 
+        # APO - 60  
+        '# Task\n"Evaluate the following reviews of an academic paper in its specific field. Provide a recommendation for acceptance: \'Accept\' (Yes), \'Reject\' (No), or \'Borderline\'. Summarize the key strengths and weaknesses mentioned by the reviewers and explain how these factors contribute to your final decision regarding the paper\'s suitability for acceptance in the academic community." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:', 
+        # APO - 61
+        '# Task\n"Evaluate the following reviews of an academic paper and provide a recommendation for acceptance based on the overall sentiment expressed by the reviewers. Your assessment should summarize key strengths and weaknesses highlighted in the reviews, emphasizing how they contribute to the overall evaluation of the paper. Weigh the strengths against the weaknesses to determine the paper\'s potential contribution to its field. Based on your evaluation, recommend one of the following: \'Accept\' (Yes), \'Reject\' (No), or \'Borderline\'. Justify your recommendation by articulating the overall sentiment toward the paper, while ensuring that it aligns with the specific points raised by the reviewers." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:',
+        # APO - 62
+        '# Task\n"Evaluate the following reviews of an academic paper and provide a recommendation for acceptance. Your analysis should prioritize the overall sentiment of the reviews, focusing on whether the strengths significantly outweigh the weaknesses or vice versa. Your recommendation should be either \'Accept\' (Yes), \'Reject\' (No), or \'Borderline\'. Justify your recommendation by summarizing the key points from the reviews, highlighting the paper\'s contributions to the field, the quality of the work, and any critical concerns raised. Ensure that your assessment reflects the dominant sentiment from the reviews, while still acknowledging the presence of both strengths and weaknesses. Discuss the implications of the reviews on the paper\'s suitability for the intended venue." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:', 
+        # APO - 63
+        '# Task\n"Please evaluate the assessments given for the academic paper to decide if it merits acceptance (Yes) or rejection (No). Take into account the emphasized strengths and weaknesses within the context of all reviews, including the paper\'s contributions to the discipline, clarity of presentation, and empirical findings. While each review may point out particular shortcomings, judge if the paper has enough potential or value to outweigh these criticisms. Lean towards acceptance if the overall significance and contributions are considerable, even in the presence of some drawbacks; lean towards rejection if the critiques indicate critical flaws or limitations that diminish the paper\'s worth. Conclude your decision by synthesizing insights from all reviews and concentrating on the paper\'s overall evaluation." \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:', 
+        # APO -64
+        "# Task\nKindly assess the reviews provided for the academic paper to determine its chances of being accepted (Yes) or rejected (No). Pay particular attention to the innovative elements of the paper, especially any new methodologies or frameworks it presents, and evaluate the importance of its contributions to the field. While going through the critiques, consider the strengths pointed out by the reviewers, such as robust experimental findings, clarity in presentation, and the paper's ability to tackle current issues in the discipline. Also, acknowledge any noted weaknesses, but balance them against the overall significance and relevance of the research. If the paper shows a solid foundation and promising findings that could advance the field, you should lean toward acceptance; on the other hand, if the criticisms outweigh the advantages and suggest insufficient contributions, you should lean toward rejection. Finally, provide a summary of the paper’s overall relevance and potential impact within its research area. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:", 
+        # APO -65
+        '# Task\nInstruction: Assess the evaluations of the academic paper to determine whether it should be accepted (Yes) or rejected (No). Focus on the originality and innovation of the research, its contributions to the field, and the significance of the findings. While considering the strengths highlighted in the reviews, such as novel methodologies and practical applications, also take note of the weaknesses mentioned, including clarity, theoretical rigor, and experimental robustness. If the paper demonstrates substantial originality or methodological advancements, even if there are some criticisms, lean towards acceptance. However, if the weaknesses indicate fundamental flaws or a lack of significant contributions, consider rejection. Aim to provide a balanced evaluation that acknowledges the potential impact of the research while addressing any concerns raised in the reviews, avoiding an excessively strict interpretation of the balance between strengths and weaknesses. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:', 
+        # OPRO - 66
+        '# Task\nAnalyze the peer reviews of the research paper in question, emphasizing the innovative methods, quality of results, and clarity of presentation. Determine if the positive aspects identified by reviewers substantially outweigh the weaknesses indicated. Draft a comprehensive conclusion recommending either acceptance (Yes) or rejection (No), substantiating your position with detailed references from the reviews that illustrate the strengths of the research, while counteracting any critiques that may appear dichas emerging or reliant on misunderstandings. Ensure your final recommendation decisively captures the potential relevance and influence of the work in its field. Conclude with insights into future implications and applications of this research. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:',
+        # OPRO - 67
+        "# Task\nAssess the peer reviews of the submitted research paper, focusing on the initial innovative ideas, the applicability and practicality of the proposed methods, as well as the clarity and depth of the narrative. Determine if the strengths emphasized by the reviewers significantly compensate for the noted weaknesses. Offer a final judgment recommending either publication (Yes) or non-publication (No), strongly backing your choice with specific citations from the reviews that highlight the merits and the impact potential of the research. Address misleading criticisms raised by the reviewers and contemplate the work's ability to influence future research or real-world applications. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 68
+        "# Task\nPerform a concentrated qualitative evaluation of the peer reviews for the submitted research paper, emphasizing the innovative aspects of the proposed methodologies, the robustness and reliability of the evidence presented, as well as the clarity of the arguments articulated within the text. Assess whether the commendable traits further elaborated by reviewers overwhelmingly eclipse any criticisms raised. Conclude by delivering a judicious endorsement for acceptance (Yes) or a disinclination for approval (No), leveraging concrete instances from the reviews to elucidate strengths, while discouraging substantially misguided or overemphasized critiques, making a case for the contribution’s promising trajectory within the relevant academic discourse. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 69
+        "# Task\nPerform a detailed examination of the peer reviews for the submitted research paper, prioritizing the evaluation of the innovative character of the proposed approach, the significance and reliability of empirical findings, and the overall coherency in communication and argumentation. Assess whether the robust characteristics highlighted by the reviewers robustly outweigh their concerns. Provide a comprehensive verdict advocating for acceptance (Yes) or a refusal (No), embedded in quotes from the reviews illustrating essential positive attributes while refuting any criticism that lacks foundational grounding or employs erroneous assumptions. Finally, evaluate the anticipated impact of the work on future scholarly efforts and practical applications. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 70
+        "# Task\nCritically assess the peer reviews of the research paper, highlighting its key contributions, innovations, and potential impact on the field, while closely examining any raised concerns. Determine if the advantages and novel aspects presented in the reviews significantly outweigh the criticisms, leading to a recommended decision of acceptance (Yes) or rejection (No). Provide a balanced conclusion that includes direct references to reviews that support your case for acceptance, explain the merits of the paper in detail, and address flaws in reviewer critiques where relevant. Ensure a strong emphasis on the work's significance for future research and applications in its specific area. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 71
+        "# Task\nThoroughly review the peer reviews for the research paper, with keen focus on the originality and practicality of the proposed novelty, the strength and validity of their empirical data, as well as concise expression within the narrative. Analyze if the noteworthy strengths markedly overshadow the weaknesses highlighted by reviewers. Result in a conclusive recommendation for acceptance (Yes) or rejection (No), bolstered by illustrative quotations from the reviews that illustrate important positive contributions while invalidating minor or misconstrued criticisms. Furthermore, reflect on the critical implications the research may have for future progression within the discipline and relevant real-world applications. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",    
+        # initial - 72
+        "# Task\nGiven the following reviews (text), determine if a paper would be accepted (Yes) or not (No) by an academic conference. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # initial - 73
+        "# Task\nGiven the following reviews, determine if the paper being reviewed would be accepted at an academic conference. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 74
+        "# Task\nEvaluate the submitted research paper based on peer reviews focusing on the originality, clarity of contributions, novelty of methodological approaches, and the quality of experimental results. Determine whether the paper merits acceptance (Yes) or rejection (No) by thoroughly analyzing how positive assessments outweigh any criticisms, ensuring a balanced recommendation aligned with reviewer sentiments and emphasizing significant contributions within the field. Please substantiate your decision, offering a clear conclusion that contrasts identified strengths against weaknesses proficiently. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 75
+        "# Task\nConduct a comprehensive analysis of the peer reviews for the research paper, assessing its acceptance (Yes) or rejection (No). Evaluate aspects such as inventiveness, methodological soundness, presentation clarity, and educational contribution, while systematically detailing how the merits of the research significantly overpower highlighted deficiencies. Summarize your findings to articulate a clear verdict, demonstrating alignment with the prevalent sentiment expressed in the reviews and focusing on the overall value added to the field. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 76
+        "# Task\nConduct a detailed evaluation of the peer reviews for the presented research paper, determining whether it should be accepted (Yes) or rejected (No). Pay close attention to the originality of contributions, clarity in explanations, the significance of empirical results, and methodological soundness. Your assessment should adequately reflect how strong positive feedback significantly counters identified critiques, leading to a well-reasoned recommendation. Synthesize key aspects from the reviews to provide a lucid justification for your decision, ensuring alignment with the majority consensus highlighted in the evaluations. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 77
+        "# Task\nEvaluate the peer reviews of the research paper to issue a recommendation for acceptance (Yes) or rejection (No). Emphasize the paper’s methodological contributions, originality, experimental rigor, and clarity of presentation while analytically confronting the strengths against any noted concerns. Confirm a balanced decision by synthesizing feedback from reviewers and providing a clear rationale alongside evidential support illustrating the paper’s overall impact within its domain. Ensure your concluding judgment aligns predominantly with the favorable insights highlighted in the reviews. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 78
+        "# Task\nEvaluate the peer reviews of the candidate research paper meticulously to establish a final recommendation for either acceptance (Yes) or rejection (No). Focus your assessment on critical elements such as innovation, accuracy of results, methodological soundness, presentation quality, and overall research impact. Convey how the strengths presented clearly overcome any critiques highlighted by the reviewers, articulating your rationale in a manner that integrates reviewer comments effectively. Conclude your determination by clearly illustrating the overarching contributions of the work to the field. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 79
+        "# Task\nEvaluate the peer reviews of the submitted research paper to determine a firm recommendation on its acceptance (Yes) or rejection (No). Analyze the originality, methodological soundness, empirical results, and clarity of contributions while ensuring well-founded reasoning that emphasizes significant positive feedback as exceeding any shortcomings mentioned. Conclude with a synthesis that is reflective of the reviews' overall sentiment and the paper's potential impact in the field. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 80
+        "# Task\nCritically evaluate the peer reviews of the submitted research paper to provide a definitive recommendation on whether it should be accepted (Yes) or rejected (No). Focus on analyzing the paper's contributions to the field in terms of originality, methodological soundness, clarity of presentation, and empirical validity. Distill the insights and criticisms from the reviews to construct a balanced judgment, highlighting how the positives robustly counterbalance any shortcomings addressed by the reviewers. Ensure that your recommendation reflects an amalgamated sentiment and points to the paper's potential impact within its academic context. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 81
+        "# Task\nEvaluate and synthesize the peer reviews of the research paper to make an acceptance (Yes) or rejection (No) recommendation. Carefully analyze the originality, empirical effectiveness, and clarity of the research findings. Ensure your assessment highlights how notable strengths outweigh weaknesses, systematically addressing specific reviewer comments. Emphasize substantial improvements or contributions to the field demonstrated by the research, alongside clear justifications reflecting the discerned overall impression from the reviews. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 82
+        "# Task\nEvaluate the peer reviews of the submitted research paper to decide on its acceptance (Yes) or rejection (No). Consider key factors such as methodological innovation, clarity of contributions, empirical rigor, and overarching implications for the field. Your evaluation should holistically synthesize reviewer feedback, prioritizing decisive strengths that convincingly surpass critiques and limitations cited. Conclude with a strong recommendation that mirrors the general sentiment of the reviews and highlights the potential impact and relevance of the research. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 83
+        "# Task\nInspect the peer reviews of the research paper in order to derive a final recommendation for acceptance (Yes) or rejection (No). Assess fundamental aspects such as originality, methodological integrity, clarity of communication, and relevance of findings by critically integrating both strengths and weaknesses expressed by the reviewers. Your conclusion should encapsulate the consensus from the evaluations while primarily focusing on substantial positive feedback that inspires confidence in the paper's overall merit and contribution to the field. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 84
+        "# Task\nCritically evaluate the peer reviews of the research paper to arrive at a recommendation for acceptance (Yes) or rejection (No). Carefully analyze the originality, rigor of methodology, clarity of presentation, and robustness of experimental validation while synthesizing conflicting feedback and resolving major criticisms. Highlight key strengths that decisively reinforce your recommendation, particularly emphasizing how these strengths contribute meaningfully to the field and align with the overarching sentiments expressed by the reviewers. Formulate your conclusion clearly and persuasively, reflecting comprehensive insights accumulated throughout the reviews. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 85
+        "# Task\nCritically assess the peer reviews of the research paper to conclude whether it should be accepted (Yes) or rejected (No). Analyze aspects such as theoretical contributions, empirical validation, clarity, and practical implications while synthesize multilingual viewpoints from the reviews. Highlight predominant strengths that decisively outweigh pointed weaknesses, crafting a well-supported recommendation that accurately reflects the consensus sentiment demonstrated in the evaluations. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        # OPRO - 86
+        "# Task\nAnalyze and evaluate the peer reviews of the submitted research paper to provide a definitive recommendation for acceptance (Yes) or rejection (No). Focus on assessing originality, methodological rigor, clarity of presentation, and overall contribution to the field. Consider both strengths and weaknesses articulated in the reviews, ensuring that your final assessment takes into account a balanced view of insights and critiques while ultimately prioritizing marked strengths throughout. Aim to synthesize reviewer sentiments that collectively characterize the research's value and potential impact while ensuring judicious consideration of any limitations expressed. \n\n# Output format\nAnswer Yes or No as labels\n\n# Prediction\nText: {{ text }}\nLabel:",
+        ] 
     
 
     args = {"task": "metareviewer", "data_dir": "data/", "prompts": "prompts/metareview.md", "model": "gpt-4o-mini", "eval_model": "gpt-4o-mini", "out": "results/eval-240/test_top_prompts.out", "max_threads": 8, "temperature": 0.0, "expansion_temperature": 0.7, "optimizer": "nl-gradient", "rounds": 8, "beam_size": 5, "minibatch_size": 64, "n_gradients": 4, "errors_per_gradient": 4, "gradients_per_error": 1, "steps_per_gradient": 1, "mc_samples_per_step": 2, "max_expansion_factor": 8, "engine": "chatgpt", "evaluator": "bf", "scorer": "01", "eval_rounds": 5, "eval_prompts_per_round": 6, "samples_per_eval": 8, "c": 2.0, "knn_k": 2, "knn_t": 0.993, "reject_on_errors": False, "eval_budget": 240}
     # Print all candidates
 
     with open(args["out"], 'a') as outf:
-        outf.write(f'args: {args}\n')
+        outf.write(f'\n\nargs: {args}\n')
 
     # List of test files to evaluate
     test_files = [
@@ -191,17 +262,41 @@ if __name__ == '__main__':
         "data/50+150_neurips_2024_test_1_opro.csv",
         # 20
         "data/50+150_neurips_2024_test_2_opro.csv",
-        # 21
+        # 21 smapled from 6
         "data/33+100_neurips_2024_test_1v1_0.csv",
-        # 22
+        # 22 smapled from 6
         "data/33+100_neurips_2024_test_1v1_1.csv",
-        # 23
+        # 23 smapled from 6
         "data/33+100_neurips_2024_test_1v1_2.csv",
+        # new  1: 3 distribution
+        # 24
+        "data/33+100_neurips_2024_test_00.csv",
+        # 25
+        "data/33+100_neurips_2024_test_01.csv",
+        # 26
+        "data/33+100_neurips_2024_test_02.csv",
+        # 27
+        "data/33+100_neurips_2024_test_03.csv",
+        # 28
+        "data/33+100_neurips_2024_test_04.csv",
+        # 29 - large yes
+        "data/800+100_neurips_2024_test_00.csv",
+        # 30
+        "data/100+100_neurips_2024_test_00.csv",
+        # 31
+        "data/100+100_neurips_2024_test_01.csv",
+        # 32
+        "data/100+100_neurips_2024_test_02.csv",
+        # 33
+        "data/100+100_neurips_2024_test_03.csv",
+        # 34
+        "data/100+100_neurips_2024_test_04.csv",
     ]
 
     # pick candidate index 6, 7,8 for 140+140_neurips_2024_test.csv
-    candidate_indices = [52]
-    test_files_indices = [6]  
+    # candidate_indices = [0,1,2,23,24,3,4,15,25,26,27,28]
+    candidate_indices = [74]
+    test_files_indices = [24, 25]  
     splits = ['1v1', '8v1','4v1']
 
     task = tasks.MetareviewerBinaryTask('data/', 8)
@@ -211,7 +306,8 @@ if __name__ == '__main__':
         test_file = test_files[test_file_index]
         print(f"\nEvaluating on file: {test_file}")
         with open(args["out"], 'a') as outf:
-            outf.write(f'\nEvaluating on file: {test_file}\n')
+            outf.write(f'candidate_indices: {candidate_indices}\n')
+            outf.write(f'Evaluating on file: {test_file}\n\n')
         
         test_exs = task.get_test_examples(test_file)
 
@@ -231,12 +327,15 @@ if __name__ == '__main__':
                     sub_preds.extend(preds)
                     sub_labels.extend(labels)
 
+                print(f'sub_labels: {sub_labels}')
+                print(f'sub_preds: {sub_preds}')
                 accuracy = accuracy_score(sub_labels, sub_preds)
                 micro_f1 = f1_score(sub_labels, sub_preds, average='micro')
-                binary_f1 = f1_score(sub_labels, sub_preds, average='binary')
+                binary_f1 = f1_score(sub_labels, sub_preds, average='binary', pos_label=1)
+                binary_f1_0 = f1_score(sub_labels, sub_preds, average='binary', pos_label=0)
                 macro_f1 = f1_score(sub_labels, sub_preds, average='macro')
-                print(f"\ncnt_preds: {len(sub_preds)}\n - f1_micro: {micro_f1}\n - accuracy: {accuracy}\n - f1_binary: {binary_f1}\n - f1_macro: {macro_f1}\n")
-                # f1s.append(f1)
+                print(f"\ncnt_preds: {len(sub_preds)}\n - f1_micro: {micro_f1}\n - accuracy: {accuracy}\n - f1_binary: {binary_f1}\n - f1_binary_0: {binary_f1_0}\n - f1_macro: {macro_f1}\n")
+                f1s.append(macro_f1)
                 
                 # Create and plot confusion matrix
                 cm = confusion_matrix(sub_labels, sub_preds)
@@ -249,10 +348,10 @@ if __name__ == '__main__':
                 plt.xlabel('Predicted Label')
                 
                 # Save the confusion matrix plot
-                plt.savefig(f'results/cm/APRO_cm_train_{splits[1]}_candidate_{j}_test_{test_file_index}.png')
+                plt.savefig(f'results/cm/00_cm_train_{splits[1]}_candidate_{j}_test_{test_file_index}.png')
                 plt.close()
                 
-            # with open(args["out"], 'a') as outf:  
-            #     outf.write(f'{f1s}\n')
+            with open(args["out"], 'a') as outf:  
+                outf.write(f'{f1s}\n\n')
             print(f1s)
             

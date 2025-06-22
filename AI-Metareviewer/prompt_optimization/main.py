@@ -12,7 +12,7 @@ import tasks
 import predictors
 import optimizers
 import optimizers_ds
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, accuracy_score
 from data import balance_subset
 
 def get_task_class(task_name):
@@ -62,14 +62,14 @@ def get_args():
     parser.add_argument('--eval_model', default='gpt-4o-mini')
     
     # parser.add_argument('--config', default='default.json')
-    parser.add_argument('--out', default='results/train_on_data_1v1_continue_tp1.2.out')
+    parser.add_argument('--out', default='results/train_on_data_1v1_tp0.7_new_test200.out')
     parser.add_argument('--max_threads', default=8, type=int)
     parser.add_argument('--temperature', default=0.0, type=float)
-    parser.add_argument('--expansion_temperature', default=1.2, type=float)
+    parser.add_argument('--expansion_temperature', default=0.7, type=float)
     parser.add_argument('--optimizer', default='nl-gradient')
 
     # rounds
-    parser.add_argument('--rounds', default=12, type=int)
+    parser.add_argument('--rounds', default=6, type=int)
     parser.add_argument('--beam_size', default=5, type=int)
     parser.add_argument('--n_test_exs', default=200, type=int) 
     parser.add_argument('--minibatch_size', default=64, type=int)
@@ -124,7 +124,7 @@ if __name__ == '__main__':
 
     # all balanced
     train_exs_ori = task.get_train_examples(config['data_dir'] + '/metareviewer_data_train_800.csv')
-    test_exs = task.get_test_examples(config['data_dir'] + '/metareviewer_data_test_200.csv')
+    test_exs = task.get_test_examples(config['data_dir'] + '/100+100_neurips_2024_test_01.csv')
 
     if os.path.exists(args.out):
         os.remove(args.out)
@@ -136,8 +136,6 @@ if __name__ == '__main__':
     
     candidates = [open(fp.strip()).read() for fp in args.prompts.split(',')]
 
- 
-    # for round in tqdm(range(config['rounds'])):
     for round in tqdm(range(config['rounds'])):
         print("STARTING ROUND ", round + 1)
         start = time.time()
@@ -180,10 +178,13 @@ if __name__ == '__main__':
                     labels_total.extend(labels)
                     preds_total.extend(preds)
                 
+                accuracy = accuracy_score(labels_total, preds_total)
                 f1 = f1_score(labels_total, preds_total, average='micro')
-                print(f"\nlen(preds): {len(preds_total)}\n")
+                print(f"\naccuracy: {accuracy}\n")
+                print(f"\nf1: {f1}\n")
+                # print(f"\nlen(preds): {len(preds_total)}\n")
             else:
-                _, f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs, n=args.n_test_exs)   
+                # _, f1, texts, labels, preds = task.evaluate(gpt4, candidate, test_exs, n=args.n_test_exs)   
                 print(f"\nlen(preds): {len(preds)}\n")
             metrics.append(f1)
             with open(args.out, 'a') as outf:  

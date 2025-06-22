@@ -10,7 +10,8 @@ This study focuses on optimizing nonparametric algorithms for academic paper rev
 #### Biased Prompt 
 - Prompt: 
 `Analyze the reviews provided, decide if the paper in question would be accepted at an academic conference. The vast majority of papers are accepted. About 0.05 of papers are rejected at the conference. Answer only ACCEPT or REJECT`
-- Test F1 - 4o-mini: 0.67
+- bianry Test F1 - 4o-mini: 0.67
+- macro Test F1 - 4o-mini: 0.67
 
 #### Neutral Prompts 
 - Inital Prompt for this task: 
@@ -205,5 +206,15 @@ Wrap each reason with <START> and <END>
  - test F1 score not improved or degraded within 6 rounds 
 
 
-    
+## Citation
+```
+@misc{yuan2021automate,
+      title={Automatic Prompt Optimization with "Gradient Descent" and Beam Search}, 
+      author={Reid Pryzant, Dan Iter, Jerry Li, Yin Tat Lee, Chenguang Zhu, Michael Zeng},
+      year={2023},
+      eprint={2305.03495},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+``` 
 
