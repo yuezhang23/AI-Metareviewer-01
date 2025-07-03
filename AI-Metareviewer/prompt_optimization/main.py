@@ -62,10 +62,10 @@ def get_args():
     parser.add_argument('--eval_model', default='gpt-4o-mini')
     
     # parser.add_argument('--config', default='default.json')
-    parser.add_argument('--out', default='results/train_on_data_1v1_tp0.7_new_test200.out')
+    parser.add_argument('--out', default='results/train_on_data_4v1_tp1.0_init72_fixed.out')
     parser.add_argument('--max_threads', default=8, type=int)
     parser.add_argument('--temperature', default=0.0, type=float)
-    parser.add_argument('--expansion_temperature', default=0.7, type=float)
+    parser.add_argument('--expansion_temperature', default=1.0, type=float)
     parser.add_argument('--optimizer', default='nl-gradient')
 
     # rounds
@@ -123,8 +123,8 @@ if __name__ == '__main__':
     # config, evaluator, scorer, args.max_threads, bf_eval)
 
     # all balanced
-    train_exs_ori = task.get_train_examples(config['data_dir'] + '/metareviewer_data_train_800.csv')
-    test_exs = task.get_test_examples(config['data_dir'] + '/100+100_neurips_2024_test_01.csv')
+    train_exs_ori = task.get_train_examples(config['data_dir'] + '/240+60_neurips_2024_train.csv')
+    test_exs = task.get_test_examples(config['data_dir'] + '/metareviewer_data_test_200.csv')
 
     if os.path.exists(args.out):
         os.remove(args.out)
@@ -141,10 +141,10 @@ if __name__ == '__main__':
         start = time.time()
 
         # use balance train examples, sample 100:100
-        train_exs = balance_subset.create_balanced_subset(train_exs_ori, cnt=round)
+        # train_exs = balance_subset.create_balanced_subset(train_exs_ori, cnt=round)
 
         # use original train examples
-        # train_exs = train_exs_ori
+        train_exs = train_exs_ori
 
         # expand candidates
         # if round > 0:

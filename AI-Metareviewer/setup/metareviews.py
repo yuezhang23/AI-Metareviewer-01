@@ -8,8 +8,8 @@ client = openreview.api.OpenReviewClient(
     username=config["OPENREVIEW_USERNAME"],
     password=config["OPENREVIEW_PASSWORD"]
 )
-
-venue_id = 'NeurIPS.cc/2023/Conference'
+year = 2023
+venue_id = f'NeurIPS.cc/{year}/Conference'
 
 venue_group_settings = client.get_group(venue_id).content
 submission_invitation = venue_group_settings['submission_id']['value']
@@ -39,8 +39,8 @@ for submission in submissions:
                                 raise KeyError(f"Missing required field: {field}")
                         values.append(value)
 
-                    cur.execute("""
-                    INSERT INTO metareviews_2023_NeurIPS (id, decision, comment)
+                    cur.execute(f"""
+                    INSERT INTO metareviews_{year}_NeurIPS (id, decision, comment)
                     VALUES (%s, %s, %s)
                     ON CONFLICT (id) DO UPDATE
                     SET decision = EXCLUDED.decision,

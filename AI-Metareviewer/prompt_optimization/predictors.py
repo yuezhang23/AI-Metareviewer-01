@@ -25,7 +25,7 @@ class BinaryPredictor(GPT4Predictor):
         response = utils.chatgpt(
             prompt, max_tokens=4, n=1, timeout=20, 
             temperature=self.opt['temperature'], model=self.opt['eval_model'])[0]
-        pred = 1 if response.strip().upper().startswith('YES') else 0
+        pred = 1 if response.strip().upper().startswith('YES') or response.strip().upper().startswith('ACCEPT') else 0
         return pred
 
     def batch_inference(self, examples, prompt):
@@ -38,7 +38,7 @@ class BinaryPredictor(GPT4Predictor):
             temperature=self.opt['temperature'], model=self.opt['eval_model'])
         
         # Process responses
-        preds = [1 if response.strip().upper().startswith('YES') else 0 
+        preds = [1 if response.strip().upper().startswith('YES') or response.strip().upper().startswith('ACCEPT') else 0 
                 for response in responses]
         
         return preds

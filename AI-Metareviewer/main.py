@@ -1,7 +1,6 @@
 import psycopg
 from psycopg.rows import dict_row
 from prompt_gpt import prompt
-from prompt_deepseek import academic_review_decision
 from utility import toString, getFScore, getBenchmarkDecision
 from dotenv import dotenv_values
 import os

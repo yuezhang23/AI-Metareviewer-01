@@ -7,6 +7,7 @@ from datetime import datetime
 config = dotenv_values(".env")
 client = OpenAI(api_key=config["OPENAI_API_KEY"])
 
+
 # basic prompt 
 # add1 "The vast majority of papers are accepted, only 0.05 of papers are rejected at the conference."
 # add2 "Do not lightly hand out ACCEPT." 
