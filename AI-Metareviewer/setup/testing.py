@@ -55,7 +55,7 @@ def toString(review):
 
     return ret
 
-year = 2023
+year = 2024
 def get_train_examples():
     # Get test data (100 accept + 100 reject)
     test_exs = []
@@ -72,13 +72,12 @@ def get_train_examples():
                 decision = metareview["decision"]
                 promptText = ""
 
-                cur.execute(f"SELECT * FROM reviews_{year}_NeurIPS WHERE id = %s", [id])
+                cur.execute(f"SELECT * FROM reviews_{year}_NeurIPS WHERE s_id = %s", [id])
                 allReviews = cur.fetchall()
 
                 for review in allReviews:                
                     promptText += toString(review)
                 test_exs.append({'id': id, 'text': promptText, 'label': 1 if "accept" in decision.lower() else 0})
-
 
     # Save test data
     header = ['id', 'text', 'label']
@@ -144,12 +143,6 @@ def get_additional_train_examples():
 
     return additional_exs
 
-# def get_train_examples():
-#     df = pd.read_csv('./metareviewer_data_test.csv', sep=';', header=None)
-#     exs = df.reset_index().to_dict('records')
-#     exs = [{'id': x[0], 'text': x[1], 'label': int(x[2])} for x in exs]
-#     print(exs)
-#     return exs
 
 get_train_examples()
 # get_additional_train_examples()

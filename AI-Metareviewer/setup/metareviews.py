@@ -8,7 +8,7 @@ client = openreview.api.OpenReviewClient(
     username=config["OPENREVIEW_USERNAME"],
     password=config["OPENREVIEW_PASSWORD"]
 )
-year = 2023
+year = 2024
 venue_id = f'NeurIPS.cc/{year}/Conference'
 
 venue_group_settings = client.get_group(venue_id).content
