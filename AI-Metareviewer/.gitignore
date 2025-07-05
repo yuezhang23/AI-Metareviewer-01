@@ -2,3 +2,4 @@
 __pycache__
 /results/*
 /data/*
+/setup/dump_data/*
