@@ -13,8 +13,6 @@ logger = logging.getLogger(__name__)
 
 # for docker
 config = dotenv_values(".env")
-# for local
-# config = dotenv_values("../../.env")
 
 
 client = openreview.api.OpenReviewClient(
@@ -23,7 +21,7 @@ client = openreview.api.OpenReviewClient(
     password=config["OPENREVIEW_PASSWORD"]
 )
 
-year = 2024
+year = 2023
 conference = 'NeurIPS'
 venue_id = f'{conference}.cc/{year}/Conference'
 venue_group = client.get_group(venue_id)
@@ -126,7 +124,7 @@ def dump_to_database(export_reviews):
                 for i, official_value in enumerate(sub['metareviews']):
                     try:
                         cur.execute(f"""
-                        INSERT INTO reviews_{year}_NeurIPS (s_id, id, summary, soundness, presentation, contribution, strengths, weaknesses, questions, limitations, rating, confidence, rebuttal, decision)
+                        INSERT INTO reviews_{year}_{conference} (s_id, id, summary, soundness, presentation, contribution, strengths, weaknesses, questions, limitations, rating, confidence, rebuttal, decision)
                             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                             """,
                             (sub['s_id'], official_value['id'], *official_value['values'], official_value['rebuttal'], sub['decision'])) 
@@ -140,7 +138,7 @@ def dump_to_database(export_reviews):
 valid_submission_ids = {}
 with psycopg.connect(config["DB_CONFIG"]) as conn:
     with conn.cursor() as cur:
-        cur.execute(f"SELECT id FROM metareviews_{year}_NeurIPS")
+        cur.execute(f"SELECT id FROM metareviews_{year}_{conference}")
         valid_submission_ids = {row[0] for row in cur.fetchall()}
 
 export_reviews = get_reviews(submissions, valid_submission_ids)

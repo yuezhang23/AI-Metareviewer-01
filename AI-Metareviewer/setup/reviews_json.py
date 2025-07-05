@@ -23,8 +23,8 @@ client = openreview.api.OpenReviewClient(
     password=config["OPENREVIEW_PASSWORD"]
 )
 
-year = 2023
-conference = 'NeurIPS'
+year = 2024
+conference = 'ICLR'
 venue_id = f'{conference}.cc/{year}/Conference'
 venue_group = client.get_group(venue_id)
 submission_name = venue_group.content['submission_name']['value']

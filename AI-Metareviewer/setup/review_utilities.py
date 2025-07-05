@@ -8,6 +8,9 @@ import re
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# for docker
+# config = dotenv_values(".env")
+# for local
 config = dotenv_values("../../.env")
 
 client = openreview.api.OpenReviewClient(
