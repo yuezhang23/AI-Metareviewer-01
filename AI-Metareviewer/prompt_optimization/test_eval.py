@@ -295,7 +295,7 @@ if __name__ == '__main__':
     ] 
     
 
-    args = {"task": "metareviewer", "data_dir": "data/", "prompts": "prompts/metareview.md", "model": "gpt-4o-mini", "eval_model": "gpt-4o-mini", "out": "results/eval-240/test_top_prompts.out", "max_threads": 8, "temperature": 0.0, "expansion_temperature": 0.7, "optimizer": "nl-gradient", "rounds": 8, "beam_size": 5, "minibatch_size": 64, "n_gradients": 4, "errors_per_gradient": 4, "gradients_per_error": 1, "steps_per_gradient": 1, "mc_samples_per_step": 2, "max_expansion_factor": 8, "engine": "chatgpt", "evaluator": "bf", "scorer": "01", "eval_rounds": 5, "eval_prompts_per_round": 6, "samples_per_eval": 8, "c": 2.0, "knn_k": 2, "knn_t": 0.993, "reject_on_errors": False, "eval_budget": 240}
+    args = {"task": "metareviewer", "data_dir": "data/", "prompts": "prompts/metareview.md", "model": "gpt-4.1-nano", "eval_model": "gpt-4.1-nano", "out": "results/eval-240/test_top_prompts.out", "max_threads": 8, "temperature": 0.0, "expansion_temperature": 0.7, "optimizer": "nl-gradient", "rounds": 8, "beam_size": 5, "minibatch_size": 64, "n_gradients": 4, "errors_per_gradient": 4, "gradients_per_error": 1, "steps_per_gradient": 1, "mc_samples_per_step": 2, "max_expansion_factor": 8, "engine": "chatgpt", "evaluator": "bf", "scorer": "01", "eval_rounds": 5, "eval_prompts_per_round": 6, "samples_per_eval": 8, "c": 2.0, "knn_k": 2, "knn_t": 0.993, "reject_on_errors": False, "eval_budget": 240}
     # Print all candidates
 
     with open(args["out"], 'a') as outf:
@@ -379,18 +379,36 @@ if __name__ == '__main__':
         # 36
         "data/100+100_iclr_2024_test.csv",
         # 37
-        "data/reviews_200_2024_NeurIPS.csv",
+        "data/nps24_200+200_test_no_interaction_0.csv",
         # 38
-        "data/200+200_neurips_2024_test_0.csv",
+        "data/nps24_200+200_test_interaction_0.csv",
         # 39
-        "data/200+200_neurips_2024_test_1.csv",
+        "data/nps24_200+200_test_0.5_interaction_0.csv",
         # 40
-        "data/200+200_neurips_2024_test_2.csv",
+        "data/nps24_200+200_test_0.5_interaction_1.csv",
+        # 41
+        "data/nps24_200+200_test_0.25_interaction_0.csv",
+        # 42
+        "data/nps24_200+200_test_0.25_interaction_1.csv",
+        # 43
+        "data/nps24_200+200_test_0.75_interaction_0.csv",
+        # 44
+        "data/nps24_200+200_test_0.75_interaction_1.csv",
+        # 45
+        "data/nps23_150+150_test_0.0_interaction_0.csv",
+        # 46
+        "data/nps23_150+150_test_0.25_interaction_0.csv",
+        # 47
+        "data/nps23_150+150_test_0.5_interaction_0.csv",
+        # 48
+        "data/nps23_150+150_test_0.75_interaction_0.csv",
+        # 49
+        "data/nps23_150+150_test_1.0_interaction_0.csv",
     ]
 
     # pick candidate index 6, 7,8 for 140+140_neurips_2024_test.csv
-    candidate_indices = [0, 72, 61]
-    test_files_indices = [38]  
+    candidate_indices = [0, 2, 115, 28, 35, 61, 72, 73]
+    test_files_indices = [45, 46, 47, 48, 49]  
     splits = ['1v1', '8v1','4v1']
 
     task = tasks.MetareviewerBinaryTask('data/', 8)
@@ -429,10 +447,10 @@ if __name__ == '__main__':
                 binary_f1_0 = f1_score(sub_labels, sub_preds, average='binary', pos_label=0)
                 macro_f1 = f1_score(sub_labels, sub_preds, average='macro')
                 print(f"\ncnt_preds: {len(sub_preds)}\n - f1_micro: {micro_f1}\n - accuracy: {accuracy}\n - f1_binary_1: {binary_f1_1}\n - f1_binary_0: {binary_f1_0}\n - f1_macro: {macro_f1}\n")
-                f1s.append(f'binary_0: {binary_f1_0:.4f}')
-                f1s.append(f'binary_1: {binary_f1_1:.4f}')
-                f1s.append(f'macro: {macro_f1:.4f}')
-                f1s.append(f'accuracy: {accuracy:.4f}')
+                f1s.append(binary_f1_0)
+                f1s.append(binary_f1_1)
+                f1s.append(macro_f1)
+                f1s.append(accuracy)
                 
                 with open(args["out"], 'a') as outf:  
                     outf.write(f'{f1s}\n\n')
@@ -447,7 +465,7 @@ if __name__ == '__main__':
                 plt.xlabel('Predicted Label')
                 
                 # Save the confusion matrix plot
-                plt.savefig(f'results/cm/00_cm_train_{splits[1]}_candidate_{j}_test_{test_file_index}.png')
+                plt.savefig(f'results/cm/nano/00_cm_train_{splits[1]}_candidate_{j}_test_{test_file_index}.png')
                 plt.close()
                 
             print(f1s)

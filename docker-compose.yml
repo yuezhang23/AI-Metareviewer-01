@@ -31,10 +31,10 @@ services:
       - ./.env:/app/.env
     command: >
       sh -c "
-        python setup/db_init.py &&
-        python setup/metareviews.py &&
-        python setup/reviews.py &&
-        python setup/testing.py 
+        # python setup/db_init.py &&
+        # python setup/db_metareviews.py &&
+        # python setup/db_review.py &&
+        python setup/db_testing.py 
         # python main.py --data_dir data/ --out results/meta_review_03.out --max_threads 5 --evaluator ucb --eval_rounds 3 --eval_prompts_per_round 4 --samples_per_eval 10
         # python test_eval.py --file_name results/meta_review_03.out --max_threads 16
       "

@@ -3,6 +3,10 @@ import psycopg
 import csv
 from psycopg.rows import dict_row
 import os
+import logging
+import random
+from dotenv import dotenv_values
+
 ratingScores = {
     1: "Very Strong Reject: For instance, a paper with incorrect statements, improper (e.g., offensive) language, unaddressed ethical considerations, incorrect results and/or flawed methodology (e.g., training using a test set).",
     2: "Strong Reject: For instance, a paper with major technical flaws, and/or poor evaluation, limited impact, poor reproducibility and mostly unaddressed ethical considerations.",
@@ -31,12 +35,31 @@ miscScores = {
     4: "excellent"
 }
 
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# for docker
+config = dotenv_values(".env")
+
 fields = ['summary', 'soundness', 'presentation', 'contribution', 'strengths', 'weaknesses', 'limitations', 'rating', 'confidence', 'rebuttal']
 
-def count_rebuttal(review):
-    if review['rebuttal'] is not None:
-        return 1
-    return 0
+def toString_no_rebuttal(review):
+    ret = "REVIEW \n"
+    for field in fields[:-1]:
+        if review[field] is not None:
+            ret += field.capitalize() + ":" + "\n"
+            ret += str(review[field])
+            if isinstance(review[field], int):
+                if (field == "rating"):
+                    ret += ": " + ratingScores[review[field]]
+                elif (field == "confidence"):
+                    ret += ": " + confidenceScores[review[field]]
+                else:
+                    ret += ": " + miscScores[review[field]]
+            ret += "\n\n"
+    return ret
+
 
 def toString(review):
     ret = "REVIEW \n"
@@ -52,19 +75,20 @@ def toString(review):
                 else:
                     ret += ": " + miscScores[review[field]]
             ret += "\n\n"
-
     return ret
 
-year = 2024
+year = 2023
+conference = 'NeurIPS'
+ratio = 0.0
 def get_train_examples():
     # Get test data (100 accept + 100 reject)
     test_exs = []
     with psycopg.connect(os.getenv("DB_CONFIG"), row_factory=dict_row) as conn:
         with conn.cursor() as cur:
             # Get test data
-            cur.execute(f"""(SELECT id, decision FROM metareviews_{year}_NeurIPS WHERE LOWER(decision) LIKE '%reject%' ORDER BY RANDOM()) 
+            cur.execute(f"""(SELECT id, decision FROM metareviews_{year}_{conference} WHERE LOWER(decision) LIKE '%reject%' ORDER BY RANDOM()) 
                         UNION ALL 
-                        (SELECT id, decision FROM metareviews_{year}_NeurIPS WHERE LOWER(decision) LIKE '%accept%' ORDER BY RANDOM())""")
+                        (SELECT id, decision FROM metareviews_{year}_{conference} WHERE LOWER(decision) LIKE '%accept%' ORDER BY RANDOM())""")
             test_metareviews = cur.fetchall()
             
             for metareview in test_metareviews:
@@ -72,77 +96,28 @@ def get_train_examples():
                 decision = metareview["decision"]
                 promptText = ""
 
-                cur.execute(f"SELECT * FROM reviews_{year}_NeurIPS WHERE s_id = %s", [id])
+                cur.execute(f"SELECT * FROM reviews_{year}_{conference} WHERE s_id = %s", [id])
                 allReviews = cur.fetchall()
 
-                for review in allReviews:                
-                    promptText += toString(review)
+                rebuttal_reviews = [r for r in allReviews if r['rebuttal'] is not None]
+                sample_rebuttal_reviews = random.sample(rebuttal_reviews, int(len(rebuttal_reviews) * ratio))
+                           
+                # Build prompt text
+                for review in allReviews:
+                    if review in sample_rebuttal_reviews:
+                        promptText += toString(review)
+                    else:
+                        promptText += toString_no_rebuttal(review)
                 test_exs.append({'id': id, 'text': promptText, 'label': 1 if "accept" in decision.lower() else 0})
 
     # Save test data
     header = ['id', 'text', 'label']
-    with open(f'./data/reviews_all_{year}_add_rebuttal_NeurIPS.csv', 'w', newline='', encoding="utf-8") as file:
+    with open(f'./data/reviews_{ratio}_rebuttal_{year}_{conference}.csv', 'w', newline='', encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=header, delimiter=";")
         writer.writeheader()  
         writer.writerows(test_exs)
 
     return test_exs
 
-def get_additional_train_examples():
-    # Read existing data from data.csv
-    existing_ids = set()
-    # try:
-    #     with open('./data/metareviewer_data_train_800.csv', 'r', newline='', encoding="utf-8") as file:
-    #         reader = csv.DictReader(file, delimiter=";")
-    #         for row in reader:
-    #             existing_ids.add(row['id'])
-    #     with open('./data/metareviewer_data_test_200.csv', 'r', newline='', encoding="utf-8") as file:
-    #         reader = csv.DictReader(file, delimiter=";")
-    #         for row in reader:
-    #             existing_ids.add(row['id'])
-    # except FileNotFoundError:
-    #     print("data.csv not found. Starting with empty set of existing IDs.")
-
-    # Get additional training data (800 examples)
-    additional_exs = []
-    with psycopg.connect(os.getenv("DB_CONFIG"), row_factory=dict_row) as conn:
-        with conn.cursor() as cur:
-            # Get additional training data (excluding existing IDs)
-            existing_ids_str = ','.join([f"'{id}'" for id in existing_ids]) if existing_ids else "''"
-            
-            cur.execute(f"""((SELECT id, decision FROM metareviews_{year}_NeurIPS 
-                            WHERE LOWER(decision) LIKE '%reject%' 
-                            AND id NOT IN ({existing_ids_str})
-                            ORDER BY RANDOM() LIMIT 800)
-                        UNION ALL 
-                        (SELECT id, decision FROM metareviews_{year}_NeurIPS 
-                            WHERE LOWER(decision) LIKE '%accept%' 
-                            AND id NOT IN ({existing_ids_str})
-                            ORDER BY RANDOM() LIMIT 800))""")
-            additional_metareviews = cur.fetchall()
-            
-            for metareview in additional_metareviews:
-                id = metareview["id"]
-                decision = metareview["decision"]
-                promptText = ""
-
-                cur.execute(f"SELECT * FROM reviews_{year}_NeurIPS WHERE id = %s", [id])
-                allReviews = cur.fetchall()
-
-                for review in allReviews: 
-                    promptText += toString(review)
-
-                additional_exs.append({'id': id, 'text': promptText, 'label': 1 if "accept" in decision.lower() else 0})
-
-    # Save additional data
-    header = ['id', 'text', 'label']
-    with open(f'./data/additional_data_800+800_{year}_NeurIPS.csv', 'w', newline='', encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=header, delimiter=";")
-        writer.writeheader()  
-        writer.writerows(additional_exs)
-
-    return additional_exs
-
 
 get_train_examples()
-# get_additional_train_examples()

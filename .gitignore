@@ -6,4 +6,5 @@ AI-Metareviewer/large_inputs/
 AI-Metareviewer/prompt_optimization/results/
 AI-Metareviewer/prompt_optimization/data/
 AI-Metareviewer/data_review/
+AI-Metareviewer/setup/dump_data/
 .DS_Store

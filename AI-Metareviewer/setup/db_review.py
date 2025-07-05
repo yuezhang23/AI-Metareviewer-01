@@ -12,9 +12,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # for docker
-#config = dotenv_values(".env")
-# for local
-config = dotenv_values("../../.env")
+config = dotenv_values(".env")
 
 
 client = openreview.api.OpenReviewClient(
@@ -23,7 +21,7 @@ client = openreview.api.OpenReviewClient(
     password=config["OPENREVIEW_PASSWORD"]
 )
 
-year = 2024
+year = 2023
 conference = 'NeurIPS'
 venue_id = f'{conference}.cc/{year}/Conference'
 venue_group = client.get_group(venue_id)
@@ -55,9 +53,9 @@ def get_reviews_for_single_submission(s):
             # Try to get all required fields
             if 'rebuttal' in r.content.keys():
                 rebuttal_values.append({'r_id' : r.id, 'reply_id' : r.replyto, 'rebuttal' : r.content['rebuttal']['value']})
-            elif 'comment' in r.content.keys():
+            elif 'decision' not in r.content.keys() and 'comment' in r.content.keys():
                 comment_values.append({'c_id' : r.id, 'reply_id' : r.replyto, 'comment' : r.content['comment']['value']})                   
-            elif 'decision' not in r.content.keys():
+            elif 'summary' in r.content.keys():
                 values = []
                 if r.replyto == s.id:
                     for field in fields:
@@ -126,7 +124,7 @@ def dump_to_database(export_reviews):
                 for i, official_value in enumerate(sub['metareviews']):
                     try:
                         cur.execute(f"""
-                        INSERT INTO reviews_{year}_NeurIPS (s_id, id, summary, soundness, presentation, contribution, strengths, weaknesses, questions, limitations, rating, confidence, rebuttal, decision)
+                        INSERT INTO reviews_{year}_{conference} (s_id, id, summary, soundness, presentation, contribution, strengths, weaknesses, questions, limitations, rating, confidence, rebuttal, decision)
                             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                             """,
                             (sub['s_id'], official_value['id'], *official_value['values'], official_value['rebuttal'], sub['decision'])) 
@@ -136,28 +134,12 @@ def dump_to_database(export_reviews):
                         continue
 
 
-# Dump export_reviews to JSON file
-def dump_to_json(export_reviews):
-    # Create output directory if it doesn't exist
-    output_dir = "./data"
-    os.makedirs(output_dir, exist_ok=True)
-
-    # Save export_reviews to JSON file
-    output_file = os.path.join(output_dir, f"/reviews_{year}_{conference}.json")
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(export_reviews, f, indent=2, ensure_ascii=False)
-
-    logger.info(f"Exported {len(export_reviews)} reviews to {output_file}")
-
-
-
 # First get all valid submission IDs from metareviews table
 valid_submission_ids = {}
 with psycopg.connect(config["DB_CONFIG"]) as conn:
     with conn.cursor() as cur:
-        cur.execute(f"SELECT id FROM metareviews_{year}_NeurIPS")
+        cur.execute(f"SELECT id FROM metareviews_{year}_{conference}")
         valid_submission_ids = {row[0] for row in cur.fetchall()}
 
 export_reviews = get_reviews(submissions, valid_submission_ids)
-# dump_to_database(export_reviews)
-dump_to_json(export_reviews)
+dump_to_database(export_reviews)
